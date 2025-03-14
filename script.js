@@ -137,7 +137,36 @@
             }
         }
         
+        function postComment() {
+            const commentText = document.getElementById("comment-input").value;
+            if (commentText.trim() === "" || !user) return;
+            db.collection("comments").add({
+                username: user.displayName,
+                photo: user.photoURL,
+                text: commentText,
+                timestamp: firebase.firestore.FieldValue.serverTimestamp()
+            });
+            document.getElementById("comment-input").value = "";
+        }
         
+        function loadComments() {
+            db.collection("comments").orderBy("timestamp", "desc").onSnapshot((snapshot) => {
+                const commentsList = document.getElementById("comments-list");
+                commentsList.innerHTML = "";
+                snapshot.forEach((doc) => {
+                    let comment = doc.data();
+                    let commentElement = document.createElement("div");
+                    commentElement.className = "comment";
+                    commentElement.innerHTML = `
+                        <img src="${comment.photo}" width="30" height="30" style="border-radius:50%"> 
+                        <strong>${comment.userName}</strong>: ${comment.text}
+                    `;
+                    commentsList.appendChild(comment);
+            });
+        });
+    }
+
+    document.getElementById("post-comment").addEventListener("click", postComment);
         
         
         
