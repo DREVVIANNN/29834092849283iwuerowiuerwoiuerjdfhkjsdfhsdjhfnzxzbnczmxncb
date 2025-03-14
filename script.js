@@ -80,44 +80,36 @@ let bitcoin = 0;
         });
 
         function loadUserData() {
-            if (user) {
-                const userRef = db.collection("users").doc(user.uid);
-                userRef.get().then(doc => {
+            if (auth.currentUser) {
+                const userRef = db.collection("users").doc(auth.currentUser.uid);
+                userRef.get().then((doc) => {
                     if (doc.exists) {
-                        const data = doc.data();
-                        bitcoin = data.bitcoin || 0;
-                        upgradeCost = data.upgradeCost || 10;
-                        miningPower = data.miningPower || 1;
-                        document.getElementById("bitcoin").textContent = bitcoin;
-                        document.getElementById("upgrade-cost").textContent = upgradeCost;
-                        document.getElementById("user-photo").src = user.photoURL;
-                        document.getElementById("user-photo").style.display = "block";
-                        document.getElementById("user-info").style.display = "flex";
-                        document.getElementById("login-google").style.display = "none";
-                        document.getElementById("logout-btn").style.display = "block";
-                    }
-                    else {
-                        // New user bonus
+                        bitcoin = doc.data().bitcoin || 0;
+                        upgradeCost = doc.data().upgradeCost || 10;
+                        miningPower = doc.data().miningPower || 1;
+                    } else {
+                        // New users get 50 BTC for free
                         bitcoin = 50;
-                        updateUI();
                         saveUserData();
                     }
+                    updateUI();
                 });
             }
         }
+        
         
         function saveUserData() {
-            if (user) {
-                const userRef = db.collection("users").doc(user.uid);
-                userRef.set({
+            if (auth.currentUser) {
+                db.collection("users").doc(auth.currentUser.uid).set({
                     bitcoin: bitcoin,
                     upgradeCost: upgradeCost,
-                    miningPower: miningPower,
+                    miningPower: miningPower
                 });
             }
         }
         
-        setInterval(saveUserData, 5000);
+        
+        setInterval(saveUserData, 1000);
 
 const firebaseConfig = {
     apiKey: "AIzaSyBtmafoTlFm8EARO3i8kKVPOJjVph3On3M",
@@ -127,8 +119,8 @@ const firebaseConfig = {
     messagingSenderId: "851224192233",
     appId: "1:851224192233:web:eb95330e8ec6ae326bfc78"
   };
-
   firebase.initializeApp(firebaseConfig);
-        const auth = firebase.auth();
-        const db = firebase.firestore();
-        const storage = firebase.storage();
+
+  const auth = firebase.auth();
+  const db = firebase.firestore();
+  
