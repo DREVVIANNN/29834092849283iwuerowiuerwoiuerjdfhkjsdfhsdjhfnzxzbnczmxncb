@@ -44,44 +44,39 @@ nav {
     color: white;
     text-align: center;
 }
-#comments-container {
-    margin-top: 30px;
+#comment-box {
+    margin-top: 20px;
     padding: 10px;
-    width: 400px;
-    justify-content: center;
+    width: 425px;
     justify-self: center;
+    justify-content: center;
     display: grid;
-    background: #1e1e1e;
-    border-radius: 10px;
-    padding: 15px;
-}
-.comment {
     background: #222;
-    padding: 10px;
-    margin: 10px 0;
     border-radius: 5px;
 }
 #comment-input {
-    width: 250px;
-    height: 100px;
+    width: 100%;
     padding: 10px;
-    border: 1px solid #555;
+    border: none;
+    justify-self: center;
+    justify-content: center;
+    display: grid;
+    position: relative;
     border-radius: 5px;
-    background-color: #222;
-    color: white;
-    font-size: 14px;
-    outline: none;
-    resize: none;
-    transition: border 0.3s ease-in-out;
+    margin-right: 10px;
 }
-
-#comment-input::placeholder {
-    color: #888;
-    font-style: italic;
+#comment-list {
+    margin-top: 10px;
+    max-height: 200px;
+    overflow-y: auto;
+    background: #333;
+    padding: 10px;
+    border-radius: 5px;
 }
-
-#comment-input:focus {
-    border-color: #f7931a;
+.comment {
+    padding: 5px;
+    border-bottom: 1px solid #444;
+    text-align: left;
 }
 #bitcoin {
     font-weight: bold;
