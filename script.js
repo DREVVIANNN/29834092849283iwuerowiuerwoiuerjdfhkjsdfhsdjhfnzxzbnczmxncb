@@ -98,61 +98,56 @@ let bitcoin = 0;
             });
         });
 
-        async function loadUserData() {
-            if (auth.currentUser) {
-                const userRef = db.collection("users").doc(auth.currentUser.uid);
+        function loadUserData() {
+            if (user) {
+                console.log("📥 Fetching progress for user:", user.uid);
         
-                try {
-                    const doc = await userRef.get();
+                db.collection("users").doc(user.uid).get().then((doc) => {
                     if (doc.exists) {
-                        console.log("📥 Data loaded from Firestore:", doc.data());
+                        console.log("✅ Data loaded from Firestore:", doc.data());
         
-                        // ✅ Set progress from Firestore
                         bitcoin = doc.data().bitcoin || 0;
                         upgradeCost = doc.data().upgradeCost || 10;
                         miningPower = doc.data().miningPower || 1;
                     } else {
-                        console.log("🆕 New user, giving 50 BTC bonus!");
-                        bitcoin = 50;
+                        console.log("🟡 No previous data found. Giving 50 BTC bonus.");
+                        bitcoin = 50; // New user bonus
                         upgradeCost = 10;
                         miningPower = 1;
-                        await saveUserData();
+                        saveUserData();
                     }
-                } catch (error) {
-                    console.error("❌ Error loading user data:", error);
-                }
+                    updateUI();
+                }).catch(error => {
+                    console.error("❌ Error fetching user data:", error);
+                });
             }
         }
         
-
-
         
         
         
-        async function saveUserData() {
-            if (auth.currentUser) {
-                const userRef = db.collection("users").doc(auth.currentUser.uid);
+        function saveUserData() {
+            if (user) {
+                console.log("📤 Saving progress for user:", user.uid);
         
-                try {
-                    await userRef.set({
-                        bitcoin: bitcoin,
-                        upgradeCost: upgradeCost,
-                        miningPower: miningPower
-                    });
-                    console.log("💾 Progress saved to Firestore!");
-                } catch (error) {
+                db.collection("users").doc(user.uid).set({
+                    bitcoin: bitcoin,
+                    upgradeCost: upgradeCost,
+                    miningPower: miningPower,
+                }).then(() => {
+                    console.log("✅ Progress saved successfully.");
+                }).catch(error => {
                     console.error("❌ Error saving progress:", error);
-                }
+                });
             } else {
-                // Save guest progress in Local Storage
+                console.log("🟡 No logged-in user. Saving progress to local storage...");
                 localStorage.setItem("bitcoin", bitcoin);
                 localStorage.setItem("upgradeCost", upgradeCost);
                 localStorage.setItem("miningPower", miningPower);
             }
         }
         
-        // Save progress every second
-        setInterval(saveUserData, 1000);
+        
         
 
 
@@ -170,17 +165,13 @@ const auth = firebase.auth();
 const db = firebase.firestore();
 
 firebase.auth().setPersistence(firebase.auth.Auth.Persistence.LOCAL)
-    .then(() => {
-        console.log("✅ Firebase Auth Persistence set to LOCAL");
-    })
-    .catch((error) => {
-        console.error("❌ Error setting persistence:", error);
-    });
+    .then(() => console.log("✅ Firebase Auth Persistence Enabled"))
+    .catch(error => console.error("❌ Auth Persistence Error:", error));
 
 
-
-    auth.onAuthStateChanged((user) => {
-        if (user) {
+    firebase.auth().onAuthStateChanged((loggedUser) => {
+        if (loggedUser) {
+            user = loggedUser;
             console.log("✅ User logged in:", user.displayName);
     
             // Update UI with user info
@@ -189,14 +180,14 @@ firebase.auth().setPersistence(firebase.auth.Auth.Persistence.LOCAL)
             document.getElementById("user-info").style.display = "flex";
             document.getElementById("username").textContent = user.displayName;
             document.getElementById("login-google").style.display = "none";
-            document.getElementById("logout-btn").style.display = "block";
+            document.getElementById("logout-btn").style.display = "inline";
     
-            // 🚀 Load saved progress from Firestore
-            loadUserData().then(updateUI);
+            // ✅ Call `loadUserData()` to retrieve progress from Firestore
+            loadUserData();
         } else {
-            console.log("🔄 No user logged in. Loading guest progress...");
+            console.log("🟡 No user logged in. Loading guest progress...");
     
-            // Load progress from Local Storage for guest users
+            // Load progress from Local Storage for guests
             bitcoin = parseInt(localStorage.getItem("bitcoin")) || 0;
             upgradeCost = parseInt(localStorage.getItem("upgradeCost")) || 10;
             miningPower = parseInt(localStorage.getItem("miningPower")) || 1;
@@ -204,6 +195,10 @@ firebase.auth().setPersistence(firebase.auth.Auth.Persistence.LOCAL)
             updateUI();
         }
     });
+    
+    
+    
+    
     
 
 
