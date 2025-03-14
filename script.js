@@ -99,29 +99,24 @@ let bitcoin = 0;
         });
 
         function loadUserData() {
-            if (auth.currentUser) {
-                const userRef = db.collection("users").doc(auth.currentUser.uid);
-                userRef.get().then((doc) => {
-                    if (doc.exists) {
-                        bitcoin = doc.data().bitcoin || 0;
-                        upgradeCost = doc.data().upgradeCost || 10;
-                        miningPower = doc.data().miningPower || 1;
-                    } else {
-                        bitcoin = 50; // New logged-in users get 50 BTC
-                        upgradeCost = 10;
-                        miningPower = 1;
-                        saveUserData();
-                    }
-                    updateUI();
-                });
+    if (auth.currentUser) {
+        const userRef = db.collection("users").doc(auth.currentUser.uid);
+        userRef.get().then((doc) => {
+            if (doc.exists) {
+                bitcoin = doc.data().bitcoin || 0;
+                upgradeCost = doc.data().upgradeCost || 10;
+                miningPower = doc.data().miningPower || 1;
             } else {
-                // Load from local storage for guest users
-                bitcoin = parseInt(localStorage.getItem("bitcoin")) || 0;
-                upgradeCost = parseInt(localStorage.getItem("upgradeCost")) || 10;
-                miningPower = parseInt(localStorage.getItem("miningPower")) || 1;
-                updateUI();
+                bitcoin = 50; // New logged-in users get 50 BTC
+                upgradeCost = 10;
+                miningPower = 1;
+                saveUserData();
             }
-        }
+            updateUI();
+        });
+    }
+}
+
         
         
         
@@ -144,6 +139,7 @@ let bitcoin = 0;
         
         setInterval(saveUserData, 1000);
 
+
 const firebaseConfig = {
     apiKey: "AIzaSyBtmafoTlFm8EARO3i8kKVPOJjVph3On3M",
     authDomain: "login-77493.firebaseapp.com",
@@ -156,32 +152,35 @@ const firebaseConfig = {
 const auth = firebase.auth();
 const db = firebase.firestore();
 
-// 🔥 Ensure Firebase Auth state persists even after refresh
 auth.setPersistence(firebase.auth.Auth.Persistence.LOCAL)
-    .then(() => console.log("Auth persistence enabled"))
-    .catch((error) => console.error("Error enabling persistence:", error));
+    .then(() => console.log("🔥 Auth persistence enabled"))
+    .catch((error) => console.error("❌ Error enabling persistence:", error));
 
-// Listen for auth state changes and load user progress
+
 auth.onAuthStateChanged((user) => {
     if (user) {
-        loadUserData(); // Load from Firestore if logged in
-    } else {
-        loadUserData(); // Load from local storage for guests
-    }
+        console.log("✅ User is logged in:", user.displayName);
+        
+        // Update UI
+        document.getElementById("user-photo").src = user.photoURL;
+        document.getElementById("user-photo").style.display = "block";
+        document.getElementById("user-info").style.display = "flex";
+        document.getElementById("username").textContent = user.displayName;
+        document.getElementById("login-google").style.display = "none";
+        document.getElementById("logout-btn").style.display = "block";
 
-    auth.onAuthStateChanged((user) => {
-        if (user) {
-            loadUserData(); // Load from Firestore if logged in
-            document.getElementById("user-photo").src = user.photoURL;
-            document.getElementById("user-photo").style.display = "block";
-            document.getElementById("user-info").style.display = "flex";
-            document.getElementById("username").textContent = user.displayName;
-            document.getElementById("login-google").style.display = "none";
-            document.getElementById("logout-btn").style.display = "block";
-        } else {
-            loadUserData(); // Load from local storage for guests
-        }
-    });
-    
+        // Load progress from Firestore
+        loadUserData();
+    } else {
+        console.log("🔄 No user logged in. Loading guest progress...");
+
+        // Load progress from Local Storage
+        bitcoin = parseInt(localStorage.getItem("bitcoin")) || 0;
+        upgradeCost = parseInt(localStorage.getItem("upgradeCost")) || 10;
+        miningPower = parseInt(localStorage.getItem("miningPower")) || 1;
+        
+        updateUI();
+    }
 });
+
   
