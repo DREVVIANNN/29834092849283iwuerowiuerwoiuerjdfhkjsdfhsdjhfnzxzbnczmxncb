@@ -1,19 +1,21 @@
 let bitcoin = 0;
         let upgradeCost = 10;
-        let user = null;
         let miningPower = 1;
+        let user = null;
 
         document.getElementById("mine-btn").addEventListener("click", () => {
             bitcoin += 1 * miningPower;
             updateUI();
+            saveUserData();
         });
 
         document.getElementById("upgrade-btn").addEventListener("click", () => {
             if (bitcoin >= upgradeCost) {
                 bitcoin -= upgradeCost;
                 miningPower++;
-                upgradeCost = Math.floor(upgradeCost * 1.5);
+                upgradeCost = Math.ceil(upgradeCost * 1.5);
                 updateUI();
+                saveUserData();
             }
         });
 
@@ -22,30 +24,61 @@ let bitcoin = 0;
             document.getElementById("upgrade-cost").textContent = upgradeCost;
         }
 
+        function saveUserData() {
+            if (auth.currentUser) {
+                const userRef = db.collection("users").doc(user.uid);
+                user && user.uid && db.collection("users").doc(user.uid).set({
+                    bitcoin: bitcoin,
+                    upgradeCost: upgradeCost,
+                    miningPower: miningPower
+                });
+            }
+        }
+
+        function loadUserData() {
+            if (user) {
+                const userRef = db.collection("users").doc(user.uid);
+                userRef.get().then((doc) => {
+                    if (doc.exists) {
+                        bitcoin = doc.data().bitcoin || 0;
+                        upgradeCost = doc.data().upgradeCost || 10;
+                        miningPower = doc.data().miningPower || 1;
+                    } else {
+                        bitcoin = 50;
+                        upgradeCost = 10;
+                        saveUserData();
+                    }
+                    updateUI();
+                });
+            }
+        }
+
         document.getElementById("login-google").addEventListener("click", () => {
             const provider = new firebase.auth.GoogleAuthProvider();
-            auth.signInWithPopup(provider).then(result => {
+            firebase.auth().signInWithPopup(provider).then((result) => {
                 user = result.user;
-                document.getElementById("username").textContent = `Welcome, ${user.displayName}`;
                 document.getElementById("user-photo").src = user.photoURL;
                 document.getElementById("user-photo").style.display = "block";
                 document.getElementById("user-info").style.display = "flex";
+                document.getElementById("username").textContent = user.displayName;
                 document.getElementById("login-google").style.display = "none";
+                document.getElementById("logout-btn").style.display = "block";
                 loadUserData();
-            }).catch(error => {
-                console.error("Login Failed", error);
             });
         });
-        
+
         document.getElementById("logout-btn").addEventListener("click", () => {
-            auth.signOut().then(() => {
+            firebase.auth().signOut().then(() => {
+                user = null;
+                bitcoin = 0;
+                upgradeCost = 10;
+                miningPower = 1;
+                updateUI();
                 document.getElementById("user-info").style.display = "none";
                 document.getElementById("login-google").style.display = "block";
-                document.getElementById("username").textContent = "";
-                document.getElementById("user-photo").style.display = "none";
             });
         });
-        
+
         function loadUserData() {
             if (user) {
                 const userRef = db.collection("users").doc(user.uid);
@@ -54,10 +87,20 @@ let bitcoin = 0;
                         const data = doc.data();
                         bitcoin = data.bitcoin || 0;
                         upgradeCost = data.upgradeCost || 10;
+                        miningPower = data.miningPower || 1;
                         document.getElementById("bitcoin").textContent = bitcoin;
                         document.getElementById("upgrade-cost").textContent = upgradeCost;
                         document.getElementById("user-photo").src = user.photoURL;
                         document.getElementById("user-photo").style.display = "block";
+                        document.getElementById("user-info").style.display = "flex";
+                        document.getElementById("login-google").style.display = "none";
+                        document.getElementById("logout-btn").style.display = "block";
+                    }
+                    else {
+                        // New user bonus
+                        bitcoin = 50;
+                        updateUI();
+                        saveUserData();
                     }
                 });
             }
@@ -74,7 +117,7 @@ let bitcoin = 0;
             }
         }
         
-        setInterval(saveUserData, 1000);
+        setInterval(saveUserData, 5000);
 
 const firebaseConfig = {
     apiKey: "AIzaSyBtmafoTlFm8EARO3i8kKVPOJjVph3On3M",
