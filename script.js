@@ -102,7 +102,6 @@ const firebaseConfig = {
     var user = result.user;
     // IdP data available in result.additionalUserInfo.profile.
       // ...
-      window.location.href="home.html";
   }).catch((error) => {
     // Handle Errors here.
     var errorCode = error.code;
