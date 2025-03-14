@@ -94,8 +94,15 @@ let bitcoin = 0;
                     }
                     updateUI();
                 });
+            } else {
+                // Load from local storage for guest users
+                bitcoin = parseInt(localStorage.getItem("bitcoin")) || 0;
+                upgradeCost = parseInt(localStorage.getItem("upgradeCost")) || 10;
+                miningPower = parseInt(localStorage.getItem("miningPower")) || 1;
+                updateUI();
             }
         }
+
         
         
         function saveUserData() {
@@ -105,6 +112,11 @@ let bitcoin = 0;
                     upgradeCost: upgradeCost,
                     miningPower: miningPower
                 });
+            } else {
+                // Save to local storage for guest users
+                localStorage.setItem("bitcoin", bitcoin);
+                localStorage.setItem("upgradeCost", upgradeCost);
+                localStorage.setItem("miningPower", miningPower);
             }
         }
         
@@ -120,7 +132,35 @@ const firebaseConfig = {
     appId: "1:851224192233:web:eb95330e8ec6ae326bfc78"
   };
   firebase.initializeApp(firebaseConfig);
+const auth = firebase.auth();
+const db = firebase.firestore();
 
-  const auth = firebase.auth();
-  const db = firebase.firestore();
+// 🔥 Ensure Firebase Auth state persists even after refresh
+auth.setPersistence(firebase.auth.Auth.Persistence.LOCAL)
+    .then(() => console.log("Auth persistence enabled"))
+    .catch((error) => console.error("Error enabling persistence:", error));
+
+// Listen for auth state changes and load user progress
+auth.onAuthStateChanged((user) => {
+    if (user) {
+        loadUserData(); // Load from Firestore if logged in
+    } else {
+        loadUserData(); // Load from local storage for guests
+    }
+
+    auth.onAuthStateChanged((user) => {
+        if (user) {
+            loadUserData(); // Load from Firestore if logged in
+            document.getElementById("user-photo").src = user.photoURL;
+            document.getElementById("user-photo").style.display = "block";
+            document.getElementById("user-info").style.display = "flex";
+            document.getElementById("username").textContent = user.displayName;
+            document.getElementById("login-google").style.display = "none";
+            document.getElementById("logout-btn").style.display = "block";
+        } else {
+            loadUserData(); // Load from local storage for guests
+        }
+    });
+    
+});
   
