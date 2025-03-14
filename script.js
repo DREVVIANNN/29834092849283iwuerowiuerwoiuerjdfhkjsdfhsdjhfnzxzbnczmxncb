@@ -137,32 +137,7 @@
             }
         }
         
-        document.getElementById("comment-btn").addEventListener("click", () => {
-            const commentText = document.getElementById("comment-input").value;
-            if (commentText && user) {
-                db.collection("comments").add({
-                    username: user.displayName,
-                    text: commentText,
-                    timestamp: firebase.firestore.FieldValue.serverTimestamp()
-                });
-                document.getElementById("comment-input").value = "";
-            }
-        });
-
-        function loadComments() {
-            db.collection("comments").orderBy("timestamp", "desc").onSnapshot(snapshot => {
-                const commentList = document.getElementById("comment-list");
-                commentList.innerHTML = "";
-                snapshot.forEach(doc => {
-                    const comment = doc.data();
-                    const commentDiv = document.createElement("div");
-                    commentDiv.classList.add("comment");
-                    commentDiv.textContent = `${comment.username}: ${comment.text}`;
-                    commentList.appendChild(commentDiv);
-                });
-            });
-        }
-
+        
         
         
         
@@ -222,8 +197,6 @@ firebase.auth().setPersistence(firebase.auth.Auth.Persistence.LOCAL)
             document.getElementById("login-google").style.display = "none";
             document.getElementById("logout-btn").style.display = "inline";
 
-            loadComments();
-
             // **Check if the user is the developer, show blue checkmark**
         if (user.email === "fazrelmsyamil@gmail.com") {
             document.getElementById("verified-badge").style.display = "inline-block";
@@ -244,6 +217,21 @@ firebase.auth().setPersistence(firebase.auth.Auth.Persistence.LOCAL)
             updateUI();
         }
     });
+
+    // Load leaderboard from Firestore
+    function loadLeaderboard() {
+        db.collection("leaderboard").orderBy("bitcoin", "desc").onSnapshot(snapshot => {
+            const leaderboardList = document.getElementById("leaderboard-list");
+            leaderboardList.innerHTML = "";
+            snapshot.forEach(doc => {
+                const data = doc.data();
+                const li = document.createElement("li");
+                li.textContent = `${data.username}: ${data.bitcoin} BTC`;
+                leaderboardList.appendChild(li);
+            });
+        });
+    }
+    loadLeaderboard();
     
     
     

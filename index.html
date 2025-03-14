@@ -17,9 +17,9 @@
                         <img id="user-photo" src="" alt="Profile" width="40" height="40">
                         <span id="username"></span>
                         <span id="verified-badge" style="color: #1DA1F2; font-weight: bold; display: none;"><i class="ri-verified-badge-fill"></i></span>
-                        <button id="logout-btn">Logout</button>
+                        <button class="login" id="logout-btn">Logout</button>
                     </div>
-                    <button id="login-google">Login with Google</button>
+                    <button class="login" id="login-google">Login with Google</button>
                 </nav>
                 
                 <div id="game-container">
@@ -29,11 +29,19 @@
                     <button id="upgrade-btn">Upgrade Mining (Cost: <span id="upgrade-cost">10</span> BTC)</button>
                 </div>
 
-                <div id="comment-box">
-                    <h3>Comments</h3>
-                    <input type="text" id="comment-input" placeholder="Write a comment...">
-                    <button id="comment-btn">Post</button>
-                    <div id="comment-list"></div>
+                <div id="game-container">
+                    <h1 class="info">Info</h1>
+                    <p>🚀 How to Play <br>
+                        1️⃣ Sign in with Google to save your progress. <br>
+                        2️⃣ Start mining with a basic rig and earn virtual BTC. <br>
+                        3️⃣ Upgrade your hardware to increase mining efficiency. <br>
+                        4️⃣ Join mining pools to boost rewards. <br>
+                        5️⃣ Compete in leaderboards and become the top miner! <br></p>
+                </div>
+
+                <div id="leaderboard">
+                    <h2>Leaderboard</h2>
+                    <ul id="leaderboard-list"></ul>
                 </div>
             </div>
         </div>

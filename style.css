@@ -44,40 +44,6 @@ nav {
     color: white;
     text-align: center;
 }
-#comment-box {
-    margin-top: 20px;
-    padding: 10px;
-    width: 425px;
-    justify-self: center;
-    justify-content: center;
-    display: grid;
-    background: #222;
-    border-radius: 5px;
-}
-#comment-input {
-    width: 100%;
-    padding: 10px;
-    border: none;
-    justify-self: center;
-    justify-content: center;
-    display: grid;
-    position: relative;
-    border-radius: 5px;
-    margin-right: 10px;
-}
-#comment-list {
-    margin-top: 10px;
-    max-height: 200px;
-    overflow-y: auto;
-    background: #333;
-    padding: 10px;
-    border-radius: 5px;
-}
-.comment {
-    padding: 5px;
-    border-bottom: 1px solid #444;
-    text-align: left;
-}
 #bitcoin {
     font-weight: bold;
 }
@@ -100,4 +66,40 @@ button {
 }
 button:hover {
     background: #ff9900;
+}
+h1{
+    font-size: 20px;
+}
+.info{
+    text-decoration: underline;
+}
+#leaderboard {
+    margin-top: 20px;
+    padding: 20px;
+    background: #222;
+    border-radius: 10px;
+    text-align: left;
+    max-width: 400px;
+    margin-left: auto;
+    margin-right: auto;
+}
+#leaderboard h2 {
+    text-align: center;
+}
+#leaderboard-list {
+    list-style: none;
+    padding: 0;
+}
+#leaderboard-list li {
+    padding: 8px;
+    border-bottom: 1px solid #444;
+}
+@media (max-width: 768px) {
+    h2{
+        font-size: 15px;
+    }
+    .login{
+        width: 165px;
+        font-size: 15px;
+    }
 }
