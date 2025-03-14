@@ -47,6 +47,12 @@ nav {
 #bitcoin {
     font-weight: bold;
 }
+#verified-badge {
+    color: #1DA1F2; /* Twitter Blue */
+    font-weight: bold;
+    margin-left: 5px;
+}
+
 button {
     background: #f7931a;
     color: white;

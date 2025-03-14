@@ -1,4 +1,4 @@
-let bitcoin = 0;
+    let bitcoin = 0;
         let upgradeCost = 10;
         let miningPower = 1;
         let user = null;
@@ -40,18 +40,22 @@ let bitcoin = 0;
                 const userRef = db.collection("users").doc(user.uid);
                 userRef.get().then((doc) => {
                     if (doc.exists) {
-                        bitcoin = doc.data().bitcoin || 0;
-                        upgradeCost = doc.data().upgradeCost || 10;
-                        miningPower = doc.data().miningPower || 1;
-                    } else {
-                        bitcoin = 50;
-                        upgradeCost = 10;
-                        saveUserData();
+                        let data = doc.data();
+                        bitcoin = data.bitcoin || 0;
+                        coins = data.coins || 0;
+                        upgradeCost = data.upgradeCost || 10;
+                        miningPower = data.miningPower || 1;
+                        updateUI();
+        
+                        // Show Blue Verified Badge for Developer
+                        if (user.email === "fazrelmsyamil@gmail.com") {
+                            document.getElementById("verified-badge").style.display = "inline";
+                        }
                     }
-                    updateUI();
                 });
             }
         }
+        
 
         document.getElementById("login-google").addEventListener("click", () => {
             const provider = new firebase.auth.GoogleAuthProvider();
