@@ -137,36 +137,32 @@
             }
         }
         
-        function postComment() {
+        document.getElementById("comment-btn").addEventListener("click", () => {
             const commentText = document.getElementById("comment-input").value;
-            if (commentText.trim() === "" || !user) return;
-            db.collection("comments").add({
-                username: user.displayName,
-                photo: user.photoURL,
-                text: commentText,
-                timestamp: firebase.firestore.FieldValue.serverTimestamp()
-            });
-            document.getElementById("comment-input").value = "";
-        }
-        
-        function loadComments() {
-            db.collection("comments").orderBy("timestamp", "desc").onSnapshot((snapshot) => {
-                const commentsList = document.getElementById("comments-list");
-                commentsList.innerHTML = "";
-                snapshot.forEach((doc) => {
-                    let comment = doc.data();
-                    let commentElement = document.createElement("div");
-                    commentElement.className = "comment";
-                    commentElement.innerHTML = `
-                        <img src="${comment.photo}" width="30" height="30" style="border-radius:50%"> 
-                        <strong>${comment.userName}</strong>: ${comment.text}
-                    `;
-                    commentsList.appendChild(comment);
-            });
+            if (commentText && user) {
+                db.collection("comments").add({
+                    username: user.displayName,
+                    text: commentText,
+                    timestamp: firebase.firestore.FieldValue.serverTimestamp()
+                });
+                document.getElementById("comment-input").value = "";
+            }
         });
-    }
 
-    document.getElementById("post-comment").addEventListener("click", postComment);
+        function loadComments() {
+            db.collection("comments").orderBy("timestamp", "desc").onSnapshot(snapshot => {
+                const commentList = document.getElementById("comment-list");
+                commentList.innerHTML = "";
+                snapshot.forEach(doc => {
+                    const comment = doc.data();
+                    const commentDiv = document.createElement("div");
+                    commentDiv.classList.add("comment");
+                    commentDiv.textContent = `${comment.username}: ${comment.text}`;
+                    commentList.appendChild(commentDiv);
+                });
+            });
+        }
+
         
         
         
@@ -225,6 +221,8 @@ firebase.auth().setPersistence(firebase.auth.Auth.Persistence.LOCAL)
             document.getElementById("username").textContent = user.displayName;
             document.getElementById("login-google").style.display = "none";
             document.getElementById("logout-btn").style.display = "inline";
+
+            loadComments();
 
             // **Check if the user is the developer, show blue checkmark**
         if (user.email === "fazrelmsyamil@gmail.com") {
