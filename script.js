@@ -75,12 +75,17 @@
                     if (doc.exists) {
                         // Load existing Firebase data
                         console.log("User found in database, loading progress...");
-                        // **Check if the logged-in user is the developer**
-            if (user.email === "fazrelmsyamil@gmail.com") {
-                document.getElementById("verified-badge").style.display = "inline-block";
-            } else {
-                document.getElementById("verified-badge").style.display = "none";
-            }
+                         // Check if the user is the developer
+            const isDeveloper = (user.email === "fazrelmsyamil@gmail.com");
+
+            // Store user data in Firestore
+            const userRef = db.collection("users").doc(user.uid);
+            userRef.set({
+                email: user.email,
+                username: user.displayName,
+                verified: isDeveloper, // Save verified status
+            }, { merge: true }) // Prevent overwriting existing data
+
                         loadUserData();
                     } else {
                         // 🚀 Transfer guest progress to Firestore if available
@@ -109,8 +114,8 @@
         });
 
         function loadUserData() {
-            if (user) {
-                const userRef = db.collection("users").doc(user.uid);
+            if (auth.currentUser) {
+                const userRef = db.collection("users").doc(auth.currentUser.uid);
                 userRef.get().then((doc) => {
                     if (doc.exists) {
                         let data = doc.data();
@@ -118,14 +123,15 @@
                         coins = data.coins || 0;
                         upgradeCost = data.upgradeCost || 10;
                         miningPower = data.miningPower || 1;
-                        updateUI();
         
-                        // Check Firestore for verified status
+                        // **Check Verified Badge**
                         if (data.verified === true) {
                             document.getElementById("verified-badge").style.display = "inline-block";
                         } else {
                             document.getElementById("verified-badge").style.display = "none";
                         }
+        
+                        updateUI();
                     }
                 });
             }
