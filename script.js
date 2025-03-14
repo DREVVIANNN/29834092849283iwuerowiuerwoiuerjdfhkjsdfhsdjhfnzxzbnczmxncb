@@ -110,28 +110,27 @@
 
         function loadUserData() {
             if (user) {
-                console.log("📥 Fetching progress for user:", user.uid);
-        
-                db.collection("users").doc(user.uid).get().then((doc) => {
+                const userRef = db.collection("users").doc(user.uid);
+                userRef.get().then((doc) => {
                     if (doc.exists) {
-                        console.log("✅ Data loaded from Firestore:", doc.data());
+                        let data = doc.data();
+                        bitcoin = data.bitcoin || 0;
+                        coins = data.coins || 0;
+                        upgradeCost = data.upgradeCost || 10;
+                        miningPower = data.miningPower || 1;
+                        updateUI();
         
-                        bitcoin = doc.data().bitcoin || 0;
-                        upgradeCost = doc.data().upgradeCost || 10;
-                        miningPower = doc.data().miningPower || 1;
-                    } else {
-                        console.log("🟡 No previous data found. Giving 50 BTC bonus.");
-                        bitcoin = 50; // New user bonus
-                        upgradeCost = 10;
-                        miningPower = 1;
-                        saveUserData();
+                        // Check Firestore for verified status
+                        if (data.verified === true) {
+                            document.getElementById("verified-badge").style.display = "inline-block";
+                        } else {
+                            document.getElementById("verified-badge").style.display = "none";
+                        }
                     }
-                    updateUI();
-                }).catch(error => {
-                    console.error("❌ Error fetching user data:", error);
                 });
             }
         }
+        
         
         
         
