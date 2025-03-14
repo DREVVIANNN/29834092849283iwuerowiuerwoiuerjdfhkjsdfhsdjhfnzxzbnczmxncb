@@ -99,57 +99,61 @@ let bitcoin = 0;
         });
 
         async function loadUserData() {
-    if (auth.currentUser) {
-        const userRef = db.collection("users").doc(auth.currentUser.uid);
-
-        try {
-            const doc = await userRef.get();
-            if (doc.exists) {
-                console.log("📥 Data loaded from Firestore:", doc.data());
-                bitcoin = doc.data().bitcoin || 0;
-                upgradeCost = doc.data().upgradeCost || 10;
-                miningPower = doc.data().miningPower || 1;
-            } else {
-                console.log("🆕 New user, giving 50 BTC bonus!");
-                bitcoin = 50; // New users get 50 BTC
-                upgradeCost = 10;
-                miningPower = 1;
-                await saveUserData();
+            if (auth.currentUser) {
+                const userRef = db.collection("users").doc(auth.currentUser.uid);
+        
+                try {
+                    const doc = await userRef.get();
+                    if (doc.exists) {
+                        console.log("📥 Data loaded from Firestore:", doc.data());
+        
+                        // ✅ Set progress from Firestore
+                        bitcoin = doc.data().bitcoin || 0;
+                        upgradeCost = doc.data().upgradeCost || 10;
+                        miningPower = doc.data().miningPower || 1;
+                    } else {
+                        console.log("🆕 New user, giving 50 BTC bonus!");
+                        bitcoin = 50;
+                        upgradeCost = 10;
+                        miningPower = 1;
+                        await saveUserData();
+                    }
+                } catch (error) {
+                    console.error("❌ Error loading user data:", error);
+                }
             }
-        } catch (error) {
-            console.error("❌ Error loading user data:", error);
         }
-    }
-}
+        
 
 
         
         
         
         async function saveUserData() {
-    if (auth.currentUser) {
-        const userRef = db.collection("users").doc(auth.currentUser.uid);
-
-        try {
-            await userRef.set({
-                bitcoin: bitcoin,
-                upgradeCost: upgradeCost,
-                miningPower: miningPower
-            });
-            console.log("💾 Progress saved to Firestore!");
-        } catch (error) {
-            console.error("❌ Error saving progress:", error);
+            if (auth.currentUser) {
+                const userRef = db.collection("users").doc(auth.currentUser.uid);
+        
+                try {
+                    await userRef.set({
+                        bitcoin: bitcoin,
+                        upgradeCost: upgradeCost,
+                        miningPower: miningPower
+                    });
+                    console.log("💾 Progress saved to Firestore!");
+                } catch (error) {
+                    console.error("❌ Error saving progress:", error);
+                }
+            } else {
+                // Save guest progress in Local Storage
+                localStorage.setItem("bitcoin", bitcoin);
+                localStorage.setItem("upgradeCost", upgradeCost);
+                localStorage.setItem("miningPower", miningPower);
+            }
         }
-    } else {
-        // Save guest progress in Local Storage
-        localStorage.setItem("bitcoin", bitcoin);
-        localStorage.setItem("upgradeCost", upgradeCost);
-        localStorage.setItem("miningPower", miningPower);
-    }
-}
-
-// Save progress every second
-setInterval(saveUserData, 1000);
+        
+        // Save progress every second
+        setInterval(saveUserData, 1000);
+        
 
 
 
@@ -165,37 +169,42 @@ const firebaseConfig = {
 const auth = firebase.auth();
 const db = firebase.firestore();
 
-auth.setPersistence(firebase.auth.Auth.Persistence.LOCAL)
-    .then(() => console.log("🔥 Auth persistence enabled"))
-    .catch((error) => console.error("❌ Error enabling persistence:", error));
+firebase.auth().setPersistence(firebase.auth.Auth.Persistence.LOCAL)
+    .then(() => {
+        console.log("✅ Firebase Auth Persistence set to LOCAL");
+    })
+    .catch((error) => {
+        console.error("❌ Error setting persistence:", error);
+    });
 
 
-auth.onAuthStateChanged((user) => {
-    if (user) {
-        console.log("✅ User logged in:", user.displayName);
 
-        // Hide login button, show user info
-        document.getElementById("user-photo").src = user.photoURL;
-        document.getElementById("user-photo").style.display = "block";
-        document.getElementById("user-info").style.display = "flex";
-        document.getElementById("username").textContent = user.displayName;
-        document.getElementById("login-google").style.display = "none";
-        document.getElementById("logout-btn").style.display = "block";
-
-        // 🔥 Ensure data is loaded before updating UI
-        loadUserData().then(updateUI);
-
-    } else {
-        console.log("🔄 No user logged in. Loading guest progress...");
-
-        // Load progress from Local Storage for guest users
-        bitcoin = parseInt(localStorage.getItem("bitcoin")) || 0;
-        upgradeCost = parseInt(localStorage.getItem("upgradeCost")) || 10;
-        miningPower = parseInt(localStorage.getItem("miningPower")) || 1;
-
-        updateUI();
-    }
-});
+    auth.onAuthStateChanged((user) => {
+        if (user) {
+            console.log("✅ User logged in:", user.displayName);
+    
+            // Update UI with user info
+            document.getElementById("user-photo").src = user.photoURL;
+            document.getElementById("user-photo").style.display = "block";
+            document.getElementById("user-info").style.display = "flex";
+            document.getElementById("username").textContent = user.displayName;
+            document.getElementById("login-google").style.display = "none";
+            document.getElementById("logout-btn").style.display = "block";
+    
+            // 🚀 Load saved progress from Firestore
+            loadUserData().then(updateUI);
+        } else {
+            console.log("🔄 No user logged in. Loading guest progress...");
+    
+            // Load progress from Local Storage for guest users
+            bitcoin = parseInt(localStorage.getItem("bitcoin")) || 0;
+            upgradeCost = parseInt(localStorage.getItem("upgradeCost")) || 10;
+            miningPower = parseInt(localStorage.getItem("miningPower")) || 1;
+    
+            updateUI();
+        }
+    });
+    
 
 
   
