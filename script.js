@@ -63,9 +63,28 @@ let bitcoin = 0;
                 document.getElementById("username").textContent = user.displayName;
                 document.getElementById("login-google").style.display = "none";
                 document.getElementById("logout-btn").style.display = "block";
-                loadUserData();
+        
+                const userRef = db.collection("users").doc(user.uid);
+                
+                // Check if the user already has data in Firestore
+                userRef.get().then((doc) => {
+                    if (doc.exists) {
+                        // Load existing Firebase data
+                        console.log("User found in database, loading progress...");
+                        loadUserData();
+                    } else {
+                        // 🚀 Transfer guest progress to Firestore if available
+                        bitcoin = parseInt(localStorage.getItem("bitcoin")) || 50; // New users get 50 BTC
+                        upgradeCost = parseInt(localStorage.getItem("upgradeCost")) || 10;
+                        miningPower = parseInt(localStorage.getItem("miningPower")) || 1;
+        
+                        // Save transferred progress to Firestore
+                        saveUserData();
+                    }
+                });
             });
         });
+        
 
         document.getElementById("logout-btn").addEventListener("click", () => {
             firebase.auth().signOut().then(() => {
@@ -88,8 +107,9 @@ let bitcoin = 0;
                         upgradeCost = doc.data().upgradeCost || 10;
                         miningPower = doc.data().miningPower || 1;
                     } else {
-                        // New users get 50 BTC for free
-                        bitcoin = 50;
+                        bitcoin = 50; // New logged-in users get 50 BTC
+                        upgradeCost = 10;
+                        miningPower = 1;
                         saveUserData();
                     }
                     updateUI();
@@ -102,7 +122,7 @@ let bitcoin = 0;
                 updateUI();
             }
         }
-
+        
         
         
         function saveUserData() {
@@ -113,12 +133,13 @@ let bitcoin = 0;
                     miningPower: miningPower
                 });
             } else {
-                // Save to local storage for guest users
+                // Save to Local Storage for guests
                 localStorage.setItem("bitcoin", bitcoin);
                 localStorage.setItem("upgradeCost", upgradeCost);
                 localStorage.setItem("miningPower", miningPower);
             }
         }
+        
         
         
         setInterval(saveUserData, 1000);
