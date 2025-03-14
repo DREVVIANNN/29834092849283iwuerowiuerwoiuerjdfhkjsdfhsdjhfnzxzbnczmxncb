@@ -75,6 +75,12 @@
                     if (doc.exists) {
                         // Load existing Firebase data
                         console.log("User found in database, loading progress...");
+                        // **Check if the logged-in user is the developer**
+            if (user.email === "fazrelmsyamil@gmail.com") {
+                document.getElementById("verified-badge").style.display = "inline-block";
+            } else {
+                document.getElementById("verified-badge").style.display = "none";
+            }
                         loadUserData();
                     } else {
                         // 🚀 Transfer guest progress to Firestore if available
@@ -185,6 +191,13 @@ firebase.auth().setPersistence(firebase.auth.Auth.Persistence.LOCAL)
             document.getElementById("username").textContent = user.displayName;
             document.getElementById("login-google").style.display = "none";
             document.getElementById("logout-btn").style.display = "inline";
+
+            // **Check if the user is the developer, show blue checkmark**
+        if (user.email === "fazrelmsyamil@gmail.com") {
+            document.getElementById("verified-badge").style.display = "inline-block";
+        } else {
+            document.getElementById("verified-badge").style.display = "none";
+        }
     
             // ✅ Call `loadUserData()` to retrieve progress from Firestore
             loadUserData();
