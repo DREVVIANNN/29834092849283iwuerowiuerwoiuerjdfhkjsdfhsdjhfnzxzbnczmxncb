@@ -220,23 +220,38 @@ firebase.auth().setPersistence(firebase.auth.Auth.Persistence.LOCAL)
 
     firebase.auth().onAuthStateChanged((user) => {
         if (user) {
-            // User is logged in, set them online
-            firebase.firestore().collection("leaderboard").doc(user.uid).set({
-                online: true
-            }, { merge: true });
+            const userRef = db.collection("leaderboard").doc(user.uid);
     
-            // Set user offline when they close the page
-            window.addEventListener("beforeunload", () => {
-                firebase.firestore().collection("leaderboard").doc(user.uid).set({
-                    online: false
-                }, { merge: true });
-            });
+            // Mark online when logging in
+            userRef.set({ online: true }, { merge: true });
+    
+            // Mark offline when disconnecting
+            userRef.update({ online: false }).catch((err) => console.error(err));
         }
     });
     
 
+    firebase.auth().onAuthStateChanged((user) => {
+        if (user) {
+            const userRef = db.collection("leaderboard").doc(user.uid);
+    
+            userRef.get().then((doc) => {
+                if (doc.exists) {
+                    const data = doc.data();
+                    document.getElementById("username").textContent = data.username || "Anonymous";
+    
+                    // Show the verified badge if user is verified
+                    if (data.verified === true) {
+                        document.getElementById("verified-badge").style.display = "inline";
+                    }
+                }
+            });
+        }
+    });
+    
+    
+
     function displayLeaderboard() {
-        const db = firebase.firestore();
         const leaderboardRef = db.collection("leaderboard").orderBy("btc", "desc");
     
         leaderboardRef.onSnapshot((snapshot) => {
@@ -244,10 +259,11 @@ firebase.auth().setPersistence(firebase.auth.Auth.Persistence.LOCAL)
     
             snapshot.forEach((doc) => {
                 let data = doc.data();
-                console.log("Fetched Data:", data); // Debugging: Check if data is fetched
+                console.log("Realtime Data:", data); // Debugging: Check data
     
                 if (data.username && data.btc !== undefined) {
-                    leaderboardHTML += `<li>${data.username} - ${data.btc} BTC</li>`;
+                    let status = data.online ? "🟢 Online" : "⚪ Offline"; // Show online status
+                    leaderboardHTML += `<li>${data.username} - ${data.btc} BTC (${status})</li>`;
                 }
             });
     
@@ -256,37 +272,51 @@ firebase.auth().setPersistence(firebase.auth.Auth.Persistence.LOCAL)
         });
     }
     
-    // Call the function to display leaderboard on page load
+    // Call leaderboard function on page load
     document.addEventListener("DOMContentLoaded", displayLeaderboard);
     
     
+    let currentUser = null; // Store logged-in user
     
-
-    function mineBitcoin(userId, username) {
-        const db = firebase.firestore();
-        const userRef = db.collection("leaderboard").doc(userId);
+    // Function to mine BTC
+    function mineBitcoin() {
+        if (!currentUser) return alert("Please log in to mine BTC!");
     
-        userRef.get().then((doc) => {
-            let currentBtc = 0;
-            if (doc.exists) {
-                currentBtc = doc.data().btc;
-            }
-            
-            // Update BTC and set user online
-            userRef.set({ 
-                username: username, 
-                btc: currentBtc + 1, 
-                online: true 
-            }, { merge: true });
+        const userRef = db.collection("leaderboard").doc(currentUser.uid);
+    
+        db.runTransaction((transaction) => {
+            return transaction.get(userRef).then((doc) => {
+                if (!doc.exists) {
+                    transaction.set(userRef, {
+                        username: currentUser.displayName || "Anonymous",
+                        btc: 1, // Start with 1 BTC
+                        online: true
+                    });
+                } else {
+                    transaction.update(userRef, {
+                        btc: doc.data().btc + 1, // Add BTC
+                        online: true
+                    });
+                }
+            });
         });
     }
     
-
+    // Detect login and set current user
+    firebase.auth().onAuthStateChanged((user) => {
+        if (user) {
+            currentUser = user;
     
+            // Set user online when logging in
+            db.collection("leaderboard").doc(user.uid).set(
+                {
+                    username: user.displayName || "Anonymous",
+                    online: true
+                },
+                { merge: true }
+            );
+        } else {
+            currentUser = null;
+        }
+    });
     
-    
-    
-    
-
-
-  
