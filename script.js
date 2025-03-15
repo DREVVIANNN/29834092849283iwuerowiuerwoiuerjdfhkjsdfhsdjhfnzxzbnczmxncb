@@ -244,7 +244,9 @@ firebase.auth().setPersistence(firebase.auth.Auth.Persistence.LOCAL)
     
             snapshot.forEach((doc) => {
                 let data = doc.data();
-                if (data.online) { // Only show online users
+                console.log("Fetched Data:", data); // Debugging: Check if data is fetched
+    
+                if (data.username && data.btc !== undefined) {
                     leaderboardHTML += `<li>${data.username} - ${data.btc} BTC</li>`;
                 }
             });
@@ -253,6 +255,10 @@ firebase.auth().setPersistence(firebase.auth.Auth.Persistence.LOCAL)
             document.getElementById("leaderboard").innerHTML = leaderboardHTML;
         });
     }
+    
+    // Call the function to display leaderboard on page load
+    document.addEventListener("DOMContentLoaded", displayLeaderboard);
+    
     
     
 
