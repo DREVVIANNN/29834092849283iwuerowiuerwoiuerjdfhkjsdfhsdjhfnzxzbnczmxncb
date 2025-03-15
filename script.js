@@ -218,45 +218,36 @@ firebase.auth().setPersistence(firebase.auth.Auth.Persistence.LOCAL)
         }
     });
 
-    firebase.auth().onAuthStateChanged((user) => {
+    function mineBitcoin() {
+        let bitcoin = parseInt(localStorage.getItem("bitcoin") || "0");
+        bitcoin += 10; // Increment BTC
+        localStorage.setItem("bitcoin", bitcoin);
+        document.getElementById("bitcoin").textContent = bitcoin;
+    
+        const user = firebase.auth().currentUser;
         if (user) {
             const userRef = db.collection("leaderboard").doc(user.uid);
-    
-            // Mark online when logging in
-            userRef.set({ online: true }, { merge: true });
-    
-            // Mark offline when disconnecting
-            userRef.update({ online: false }).catch((err) => console.error(err));
-        }
-    });
-    
-
-    firebase.auth().onAuthStateChanged((user) => {
-        if (user) {
-            const userRef = db.collection("leaderboard").doc(user.uid);
-    
+            
             userRef.get().then((doc) => {
-                if (doc.exists) {
-                    const data = doc.data();
-                    document.getElementById("username").textContent = data.username || "Anonymous";
+                let username = doc.exists ? doc.data().username : user.displayName || "Anonymous";
     
-                    // Show the verified badge if user is verified
-                    if (data.verified === true) {
-                        document.getElementById("verified-badge").style.display = "inline";
-                    }
+                // Save to Firestore only if BTC is 1000+
+                if (bitcoin >= 1000) {
+                    userRef.set({
+                        username: username,
+                        btc: bitcoin
+                    }, { merge: true });
                 }
             });
         }
-    });
-    
-    
+    }
 
     function displayLeaderboard() {
         const leaderboardRef = db.collection("leaderboard").orderBy("btc", "desc");
     
         leaderboardRef.onSnapshot((snapshot) => {
             const leaderboardList = document.getElementById("leaderboard-list");
-            leaderboardList.innerHTML = ""; // Clear the previous list
+            leaderboardList.innerHTML = ""; // Clear previous list
     
             snapshot.forEach((doc) => {
                 const data = doc.data();
@@ -267,51 +258,8 @@ firebase.auth().setPersistence(firebase.auth.Auth.Persistence.LOCAL)
         });
     }
     
+    // Call this function when the page loads
+    displayLeaderboard();
     
     
-    let currentUser = null; // Store logged-in user
-    
-    function mineBitcoin() {
-        let bitcoin = parseInt(localStorage.getItem("bitcoin") || "0");
-        bitcoin += 10; // Example mining rate
-        localStorage.setItem("bitcoin", bitcoin);
-        document.getElementById("bitcoin").textContent = bitcoin;
-    
-        // If logged in with Google, update Firestore
-        const user = firebase.auth().currentUser;
-        if (user) {
-            const userRef = db.collection("leaderboard").doc(user.uid);
-            userRef.get().then((doc) => {
-                let data = doc.exists ? doc.data() : {};
-                let username = data.username || user.displayName || "Anonymous";
-    
-                // Add user to leaderboard only if they have 1000 BTC
-                if (bitcoin >= 1000) {
-                    userRef.set({
-                        username: username,
-                        btc: bitcoin
-                    }, { merge: true }); // Merge prevents overwriting existing data
-                }
-            });
-        }
-    }
-    
-    
-    // Detect login and set current user
-    firebase.auth().onAuthStateChanged((user) => {
-        if (user) {
-            currentUser = user;
-    
-            // Set user online when logging in
-            db.collection("leaderboard").doc(user.uid).set(
-                {
-                    username: user.displayName || "Anonymous",
-                    online: true
-                },
-                { merge: true }
-            );
-        } else {
-            currentUser = null;
-        }
-    });
     
