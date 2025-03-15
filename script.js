@@ -255,52 +255,47 @@ firebase.auth().setPersistence(firebase.auth.Auth.Persistence.LOCAL)
         const leaderboardRef = db.collection("leaderboard").orderBy("btc", "desc");
     
         leaderboardRef.onSnapshot((snapshot) => {
-            let leaderboardHTML = "<h2>Leaderboard</h2><ul>";
+            const leaderboardList = document.getElementById("leaderboard-list");
+            leaderboardList.innerHTML = ""; // Clear the previous list
     
             snapshot.forEach((doc) => {
-                let data = doc.data();
-                console.log("Realtime Data:", data); // Debugging: Check data
-    
-                if (data.username && data.btc !== undefined) {
-                    let status = data.online ? "🟢 Online" : "⚪ Offline"; // Show online status
-                    leaderboardHTML += `<li>${data.username} - ${data.btc} BTC (${status})</li>`;
-                }
+                const data = doc.data();
+                const listItem = document.createElement("li");
+                listItem.textContent = `${data.username} - ${data.btc} BTC`;
+                leaderboardList.appendChild(listItem);
             });
-    
-            leaderboardHTML += "</ul>";
-            document.getElementById("leaderboard").innerHTML = leaderboardHTML;
         });
     }
     
-    // Call leaderboard function on page load
-    document.addEventListener("DOMContentLoaded", displayLeaderboard);
     
     
     let currentUser = null; // Store logged-in user
     
-    // Function to mine BTC
     function mineBitcoin() {
-        if (!currentUser) return alert("Please log in to mine BTC!");
+        let bitcoin = parseInt(localStorage.getItem("bitcoin") || "0");
+        bitcoin += 10; // Example mining rate
+        localStorage.setItem("bitcoin", bitcoin);
+        document.getElementById("bitcoin").textContent = bitcoin;
     
-        const userRef = db.collection("leaderboard").doc(currentUser.uid);
+        // If logged in with Google, update Firestore
+        const user = firebase.auth().currentUser;
+        if (user) {
+            const userRef = db.collection("leaderboard").doc(user.uid);
+            userRef.get().then((doc) => {
+                let data = doc.exists ? doc.data() : {};
+                let username = data.username || user.displayName || "Anonymous";
     
-        db.runTransaction((transaction) => {
-            return transaction.get(userRef).then((doc) => {
-                if (!doc.exists) {
-                    transaction.set(userRef, {
-                        username: currentUser.displayName || "Anonymous",
-                        btc: 1, // Start with 1 BTC
-                        online: true
-                    });
-                } else {
-                    transaction.update(userRef, {
-                        btc: doc.data().btc + 1, // Add BTC
-                        online: true
-                    });
+                // Add user to leaderboard only if they have 1000 BTC
+                if (bitcoin >= 1000) {
+                    userRef.set({
+                        username: username,
+                        btc: bitcoin
+                    }, { merge: true }); // Merge prevents overwriting existing data
                 }
             });
-        });
+        }
     }
+    
     
     // Detect login and set current user
     firebase.auth().onAuthStateChanged((user) => {
