@@ -220,34 +220,34 @@ firebase.auth().setPersistence(firebase.auth.Auth.Persistence.LOCAL)
 
     function mineBitcoin() {
         let bitcoin = parseInt(localStorage.getItem("bitcoin") || "0");
-        bitcoin += 10; // Increment BTC
+        bitcoin += 10; // Increase BTC
         localStorage.setItem("bitcoin", bitcoin);
         document.getElementById("bitcoin").textContent = bitcoin;
     
         const user = firebase.auth().currentUser;
         if (user) {
             const userRef = db.collection("leaderboard").doc(user.uid);
-            
+    
             userRef.get().then((doc) => {
                 let username = doc.exists ? doc.data().username : user.displayName || "Anonymous";
     
-                // Save to Firestore only if BTC is 1000+
                 if (bitcoin >= 1000) {
                     userRef.set({
                         username: username,
                         btc: bitcoin
                     }, { merge: true });
                 }
-            });
+            }).catch(error => console.error("Error updating Firestore:", error));
         }
     }
+    
 
     function displayLeaderboard() {
         const leaderboardRef = db.collection("leaderboard").orderBy("btc", "desc");
     
         leaderboardRef.onSnapshot((snapshot) => {
             const leaderboardList = document.getElementById("leaderboard-list");
-            leaderboardList.innerHTML = ""; // Clear previous list
+            leaderboardList.innerHTML = ""; // Clear list
     
             snapshot.forEach((doc) => {
                 const data = doc.data();
@@ -255,11 +255,14 @@ firebase.auth().setPersistence(firebase.auth.Auth.Persistence.LOCAL)
                 listItem.textContent = `${data.username} - ${data.btc} BTC`;
                 leaderboardList.appendChild(listItem);
             });
+        }, (error) => {
+            console.error("Error fetching leaderboard:", error);
         });
     }
     
-    // Call this function when the page loads
+    // Call this function on page load
     displayLeaderboard();
+    
     
     
     
