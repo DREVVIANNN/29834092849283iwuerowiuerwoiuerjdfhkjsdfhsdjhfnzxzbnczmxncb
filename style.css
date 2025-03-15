@@ -4,12 +4,14 @@ body {
     background-color: #121212;
     color: #fff;
     margin: 0;
+    justify-self: center;
     padding: 20px;
 }
 nav {
     background: #222;
     padding: 15px;
     display: flex;
+    max-width: 400px;
     justify-content: space-between;
     align-items: center;
     padding: 0 20px;
@@ -24,7 +26,7 @@ nav {
     width: 40px;
     height: 40px;
     border-radius: 50%;
-    margin-right: 10px;
+    margin-right: 5px;
     display: none;
 }
 #user-info span {
@@ -101,5 +103,8 @@ h1{
     .login{
         width: 165px;
         font-size: 15px;
+    }
+    .log-out{
+        width: 100px;
     }
 }

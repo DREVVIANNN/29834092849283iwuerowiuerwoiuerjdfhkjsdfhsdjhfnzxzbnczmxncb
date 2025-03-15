@@ -218,20 +218,46 @@ firebase.auth().setPersistence(firebase.auth.Auth.Persistence.LOCAL)
         }
     });
 
-    // Load leaderboard from Firestore
-    function loadLeaderboard() {
-        db.collection("leaderboard").orderBy("bitcoin", "desc").onSnapshot(snapshot => {
-            const leaderboardList = document.getElementById("leaderboard-list");
-            leaderboardList.innerHTML = "";
-            snapshot.forEach(doc => {
-                const data = doc.data();
-                const li = document.createElement("li");
-                li.textContent = `${data.username}: ${data.bitcoin} BTC`;
-                leaderboardList.appendChild(li);
-            });
+    function updateUserBitcoin(userId, username, btcAmount) {
+        const userRef = db.collection("leaderboard").doc(userId);
+    
+        userRef.get().then((doc) => {
+            if (doc.exists) {
+                // Update BTC if user already exists
+                userRef.update({ btc: btcAmount });
+            } else {
+                // Create new entry if user doesn't exist
+                userRef.set({
+                    username: username,
+                    btc: btcAmount
+                });
+            }
+        }).catch(error => {
+            console.error("Error updating Firestore:", error);
         });
     }
-    loadLeaderboard();
+    
+
+    function loadLeaderboard() {
+        const leaderboardList = document.getElementById("leaderboard-list");
+    
+        db.collection("leaderboard")
+            .orderBy("btc", "desc") // Order by highest BTC
+            .onSnapshot((snapshot) => {
+                leaderboardList.innerHTML = ""; // Clear list before updating
+                snapshot.forEach((doc) => {
+                    const data = doc.data();
+                    const listItem = document.createElement("li");
+                    listItem.textContent = `${data.username} - ${data.btc} BTC`;
+                    leaderboardList.appendChild(listItem);
+                });
+            });
+    }
+    
+    // Load leaderboard when page is loaded
+    document.addEventListener("DOMContentLoaded", loadLeaderboard);
+    
+
     
     
     
