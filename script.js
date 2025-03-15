@@ -218,44 +218,62 @@ firebase.auth().setPersistence(firebase.auth.Auth.Persistence.LOCAL)
         }
     });
 
-    function updateUserBitcoin(userId, username, btcAmount) {
-        const userRef = db.collection("leaderboard").doc(userId);
+    firebase.auth().onAuthStateChanged((user) => {
+        if (user) {
+            // User is logged in, set them online
+            firebase.firestore().collection("leaderboard").doc(user.uid).set({
+                online: true
+            }, { merge: true });
     
-        userRef.get().then((doc) => {
-            if (doc.exists) {
-                // Update BTC if user already exists
-                userRef.update({ btc: btcAmount });
-            } else {
-                // Create new entry if user doesn't exist
-                userRef.set({
-                    username: username,
-                    btc: btcAmount
-                });
-            }
-        }).catch(error => {
-            console.error("Error updating Firestore:", error);
+            // Set user offline when they close the page
+            window.addEventListener("beforeunload", () => {
+                firebase.firestore().collection("leaderboard").doc(user.uid).set({
+                    online: false
+                }, { merge: true });
+            });
+        }
+    });
+    
+
+    function displayLeaderboard() {
+        const db = firebase.firestore();
+        const leaderboardRef = db.collection("leaderboard").orderBy("btc", "desc");
+    
+        leaderboardRef.onSnapshot((snapshot) => {
+            let leaderboardHTML = "<h2>Leaderboard</h2><ul>";
+    
+            snapshot.forEach((doc) => {
+                let data = doc.data();
+                if (data.online) { // Only show online users
+                    leaderboardHTML += `<li>${data.username} - ${data.btc} BTC</li>`;
+                }
+            });
+    
+            leaderboardHTML += "</ul>";
+            document.getElementById("leaderboard").innerHTML = leaderboardHTML;
         });
     }
     
+    
 
-    function loadLeaderboard() {
-        const leaderboardList = document.getElementById("leaderboard-list");
+    function mineBitcoin(userId, username) {
+        const db = firebase.firestore();
+        const userRef = db.collection("leaderboard").doc(userId);
     
-        db.collection("leaderboard")
-            .orderBy("btc", "desc") // Order by highest BTC
-            .onSnapshot((snapshot) => {
-                leaderboardList.innerHTML = ""; // Clear list before updating
-                snapshot.forEach((doc) => {
-                    const data = doc.data();
-                    const listItem = document.createElement("li");
-                    listItem.textContent = `${data.username} - ${data.btc} BTC`;
-                    leaderboardList.appendChild(listItem);
-                });
-            });
+        userRef.get().then((doc) => {
+            let currentBtc = 0;
+            if (doc.exists) {
+                currentBtc = doc.data().btc;
+            }
+            
+            // Update BTC and set user online
+            userRef.set({ 
+                username: username, 
+                btc: currentBtc + 1, 
+                online: true 
+            }, { merge: true });
+        });
     }
-    
-    // Load leaderboard when page is loaded
-    document.addEventListener("DOMContentLoaded", loadLeaderboard);
     
 
     
