@@ -374,65 +374,8 @@ document.addEventListener("DOMContentLoaded", loadEmails);
 
 
 
-// Check if user is developer
-firebase.auth().onAuthStateChanged((user) => {
-    if (user && user.email === "fazrelmsyamil@gmail.com") {
-        document.getElementById("ban-container").style.display = "block"; // Show ban menu
-        document.getElementById("send-message-container").style.display = "block"; // Show send message menu
-    } else {
-        document.getElementById("ban-container").style.display = "none"; // Hide ban menu
-        document.getElementById("send-message-container").style.display = "none"; // Hide send message menu
-    }
-});
-
-
-// Ban a user by username
-function banUser() {
-    const username = document.getElementById("ban-username").value.trim();
-    if (username === "") {
-        alert("Please enter a username!");
-        return;
-    }
-
-    db.collection("bannedUsers").doc(username).set({ banned: true })
-        .then(() => {
-            alert(`${username} has been banned.`);
-            document.getElementById("ban-username").value = ""; // Clear input
-        })
-        .catch((error) => {
-            console.error("Error banning user:", error);
-        });
-}
-
-firebase.auth().onAuthStateChanged((user) => {
-    if (user) {
-        const username = user.displayName;
-        db.collection("bannedUsers").doc(username).get()
-            .then((doc) => {
-                if (doc.exists && doc.data().banned) {
-                    document.getElementById("game-container").innerHTML = "<h2>You are banned from the game.</h2>";
-                }
-            });
-    }
-});
-
-
- // Disable Right Click
-document.addEventListener("contextmenu", (event) => event.preventDefault());
-
-// Disable F12, Ctrl+Shift+I, Ctrl+U, Ctrl+S, Ctrl+H, etc.
-document.addEventListener("keydown", (event) => {
-    if (
-        event.key === "F12" || 
-        (event.ctrlKey && event.shiftKey && event.key === "I") || 
-        (event.ctrlKey && event.key === "U") || 
-        (event.ctrlKey && event.key === "S") || 
-        (event.ctrlKey && event.key === "H")
-    ) {
-        event.preventDefault();
-    }
-});
-   
+      
+    
     
     
     

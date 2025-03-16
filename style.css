@@ -52,6 +52,7 @@ h2{
     font-size: 13px;
     color: gray;
     margin-top: 1.5rem;
+    user-select: none;
 }
 #game-container {
     max-width: 400px;
@@ -177,32 +178,6 @@ textarea {
     font-family: sans-serif;
     border-radius: 5px;
     overflow: hidden;
-}
-#ban-container{
-    margin-top: 20px;
-    padding: 20px;
-    background: #222;
-    border-radius: 10px;
-    text-align: left;
-    max-width: 400px;
-    margin-left: auto;
-    margin-right: auto;
-    text-align: center;
-}
-#ban-username{
-    width: 300px;
-    height: 30px;
-    resize: none;
-    font-family: sans-serif;
-    border-radius: 5px;
-    overflow: hidden;
-}
-.banUser{
-    justify-self: center;
-    display: grid;
-    justify-content: center;
-    position: relative;
-    width: 305px;
 }
 #leaderboard-container {
     margin-top: 20px;
