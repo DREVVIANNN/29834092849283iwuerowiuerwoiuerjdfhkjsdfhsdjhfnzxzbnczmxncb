@@ -138,6 +138,35 @@
         }
         
         
+        function googleLogin() {
+            const provider = new firebase.auth.GoogleAuthProvider();
+            
+            firebase.auth().signInWithPopup(provider)
+                .then(result => {
+                    const user = result.user;
+                    if (user) {
+                        document.getElementById("username").textContent = user.displayName;
+                        document.getElementById("login-google").style.display = "none";
+                        document.getElementById("logout-btn").style.display = "block";
+                        document.getElementById("user-info").style.display = "flex";
+                        document.getElementById("user-photo").src = user.photoURL;
+                        document.getElementById("user-photo").style.display = "block";
+        
+                        const userRef = db.collection("leaderboard").doc(user.uid);
+        
+                        // Create a user document if it doesn't exist
+                        userRef.get().then((doc) => {
+                            if (!doc.exists) {
+                                userRef.set({
+                                    username: user.displayName || "Anonymous",
+                                    btc: 0  // Default BTC when first logging in
+                                });
+                            }
+                        });
+                    }
+                })
+                .catch(error => console.error("Login error:", error));
+        }
         
         
         
@@ -161,8 +190,6 @@
                 localStorage.setItem("miningPower", miningPower);
             }
         }
-        
-        
         
 
 
@@ -228,18 +255,13 @@ firebase.auth().setPersistence(firebase.auth.Auth.Persistence.LOCAL)
         if (user) {
             const userRef = db.collection("leaderboard").doc(user.uid);
     
-            userRef.get().then((doc) => {
-                let username = doc.exists ? doc.data().username : user.displayName || "Anonymous";
-    
-                if (bitcoin >= 1000) {
-                    userRef.set({
-                        username: username,
-                        btc: bitcoin
-                    }, { merge: true });
-                }
-            }).catch(error => console.error("Error updating Firestore:", error));
+            userRef.set({
+                username: user.displayName || "Anonymous",
+                btc: bitcoin
+            }, { merge: true }).catch(error => console.error("Firestore update error:", error));
         }
     }
+    
     
 
     function displayLeaderboard() {
@@ -247,7 +269,7 @@ firebase.auth().setPersistence(firebase.auth.Auth.Persistence.LOCAL)
     
         leaderboardRef.onSnapshot((snapshot) => {
             const leaderboardList = document.getElementById("leaderboard-list");
-            leaderboardList.innerHTML = ""; // Clear list
+            leaderboardList.innerHTML = ""; // Clear old data
     
             snapshot.forEach((doc) => {
                 const data = doc.data();
@@ -260,8 +282,9 @@ firebase.auth().setPersistence(firebase.auth.Auth.Persistence.LOCAL)
         });
     }
     
-    // Call this function on page load
-    displayLeaderboard();
+    // Load leaderboard when page opens
+    document.addEventListener("DOMContentLoaded", displayLeaderboard);
+    
     
     
     
