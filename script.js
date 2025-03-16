@@ -342,7 +342,7 @@ function loadEmails() {
             // Create the username with the verified badge
             let usernameHTML = `<strong>${data.username}</strong>`;
             if (data.verified) {
-                usernameHTML += ' <span class="verified-badge">✔</span>';
+                usernameHTML += '<span id="verified-badge"><i class="ri-verified-badge-fill"></i></span>';
             }
 
             // Set the content with profile picture
