@@ -377,10 +377,14 @@ document.addEventListener("DOMContentLoaded", loadEmails);
 // Check if user is developer
 firebase.auth().onAuthStateChanged((user) => {
     if (user && user.email === "fazrelmsyamil@gmail.com") {
-        document.getElementById("email-container").style.display = "block"; // Show email system
-        document.getElementById("ban-container").style.display = "block"; // Show ban form
+        document.getElementById("ban-container").style.display = "block"; // Show ban menu
+        document.getElementById("send-message-container").style.display = "block"; // Show send message menu
+    } else {
+        document.getElementById("ban-container").style.display = "none"; // Hide ban menu
+        document.getElementById("send-message-container").style.display = "none"; // Hide send message menu
     }
 });
+
 
 // Ban a user by username
 function banUser() {
