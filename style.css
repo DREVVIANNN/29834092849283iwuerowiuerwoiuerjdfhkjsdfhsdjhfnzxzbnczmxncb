@@ -153,14 +153,20 @@ h1{
 .love-btn {
     background: #444;
     border: none;
-    color: #f00;
+    color: #fff;
     font-size: 16px;
+    user-select: none;
     cursor: pointer;
     width: 55px;
     text-align: center;
     border-radius: 5px;
     display: block;
     margin-top: 5px;
+}
+
+.ri-heart-3-fill{
+    color: #f00;
+    font-size: 15px;
 }
 
 textarea {
