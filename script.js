@@ -140,7 +140,7 @@
         
         function googleLogin() {
             const provider = new firebase.auth.GoogleAuthProvider();
-            
+        
             firebase.auth().signInWithPopup(provider)
                 .then(result => {
                     const user = result.user;
@@ -154,12 +154,12 @@
         
                         const userRef = db.collection("leaderboard").doc(user.uid);
         
-                        // Create a user document if it doesn't exist
                         userRef.get().then((doc) => {
                             if (!doc.exists) {
                                 userRef.set({
                                     username: user.displayName || "Anonymous",
-                                    btc: 0  // Default BTC when first logging in
+                                    btc: 0,  
+                                    verified: false  // Default: Not verified
                                 });
                             }
                         });
@@ -167,6 +167,7 @@
                 })
                 .catch(error => console.error("Login error:", error));
         }
+        
         
         
         
@@ -247,7 +248,7 @@ firebase.auth().setPersistence(firebase.auth.Auth.Persistence.LOCAL)
 
     function mineBitcoin() {
         let bitcoin = parseInt(localStorage.getItem("bitcoin") || "0");
-        bitcoin += 10; // Increase BTC
+        bitcoin += 10; 
         localStorage.setItem("bitcoin", bitcoin);
         document.getElementById("bitcoin").textContent = bitcoin;
     
@@ -255,12 +256,19 @@ firebase.auth().setPersistence(firebase.auth.Auth.Persistence.LOCAL)
         if (user) {
             const userRef = db.collection("leaderboard").doc(user.uid);
     
-            userRef.set({
-                username: user.displayName || "Anonymous",
-                btc: bitcoin
-            }, { merge: true }).catch(error => console.error("Firestore update error:", error));
+            userRef.get().then(doc => {
+                if (doc.exists) {
+                    let data = doc.data();
+                    userRef.set({
+                        username: user.displayName || "Anonymous",
+                        btc: bitcoin,
+                        verified: data.verified || false // Keep the verified status
+                    }, { merge: true });
+                }
+            }).catch(error => console.error("Firestore update error:", error));
         }
     }
+    
     
     
 
@@ -274,7 +282,11 @@ firebase.auth().setPersistence(firebase.auth.Auth.Persistence.LOCAL)
             snapshot.forEach((doc) => {
                 const data = doc.data();
                 const listItem = document.createElement("li");
-                listItem.textContent = `${data.username} - ${data.btc} BTC`;
+    
+                // Check if user is verified
+                const verifiedBadge = data.verified ? " ✅" : "";  
+    
+                listItem.textContent = `${data.username} - ${data.btc} BTC${verifiedBadge}`;
                 leaderboardList.appendChild(listItem);
             });
         }, (error) => {
@@ -284,6 +296,7 @@ firebase.auth().setPersistence(firebase.auth.Auth.Persistence.LOCAL)
     
     // Load leaderboard when page opens
     document.addEventListener("DOMContentLoaded", displayLeaderboard);
+    
     
     
     
