@@ -377,6 +377,7 @@ document.addEventListener("DOMContentLoaded", loadEmails);
 // Check if user is developer
 firebase.auth().onAuthStateChanged((user) => {
     if (user && user.email === "fazrelmsyamil@gmail.com") {
+        document.getElementById("email-container").style.display = "block"; // Show email system
         document.getElementById("ban-container").style.display = "block"; // Show ban form
     }
 });
@@ -402,24 +403,14 @@ function banUser() {
 firebase.auth().onAuthStateChanged((user) => {
     if (user) {
         const username = user.displayName;
-        const userEmail = user.email;
-
-        // Check if user is the developer
-        if (userEmail === "fazrelmsyamil@gmail.com") {
-            document.getElementById("ban-container").style.display = "block"; // Show ban menu
-            document.getElementById("email-container").style.display = "block"; // Show email system
-        }
-
-        // Check if user is banned
         db.collection("bannedUsers").doc(username).get()
             .then((doc) => {
                 if (doc.exists && doc.data().banned) {
-                    document.getElementById("game-container").innerHTML = "<h2>You are banned from playing.</h2>";
+                    document.getElementById("game-container").innerHTML = "<h2>You are banned from the game.</h2>";
                 }
             });
     }
 });
-
 
 
  // Disable Right Click
