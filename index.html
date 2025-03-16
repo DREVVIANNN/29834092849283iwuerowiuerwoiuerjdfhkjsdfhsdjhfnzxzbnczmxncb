@@ -17,9 +17,13 @@
                         <img id="user-photo" src="" alt="Profile" width="40" height="40">
                         <span id="username"></span>
                         <span id="verified-badge" style="color: #1DA1F2; font-weight: bold; display: none;"><i class="ri-verified-badge-fill"></i></span>
-                        <button class="log-out" id="logout-btn">Logout</button>
+                        <button title="Log-Out" class="log-out" id="logout-btn">
+                            <i class="ri-logout-box-r-line"></i>
+                        </button>
                     </div>
-                    <button class="login" id="login-google">Login with Google</button>
+                    <button class="login" id="login-google">
+                        <i title="Login With Google" class="ri-google-fill"></i>
+                    </button>
                 </nav>
                 
                 <div id="game-container">
@@ -42,6 +46,7 @@
                 <div id="leaderboard-container">
                     <h2>Leaderboard</h2>
                     <ul id="leaderboard-list"></ul>
+                    <p class="leaderboard-refresh">Automatically refresh after 7 days.</p>
                 </div>
             </div>
         </div>

@@ -284,9 +284,9 @@ firebase.auth().setPersistence(firebase.auth.Auth.Persistence.LOCAL)
                 const listItem = document.createElement("li");
     
                 // Check if user is verified
-                const verifiedBadge = data.verified ? " ✅" : "";  
+                const verifiedBadge = data.verified ? '<span id="verified-badge"><i class="ri-verified-badge-fill"></i></span>' : "";
     
-                listItem.textContent = `${data.username} - ${data.btc} BTC${verifiedBadge}`;
+                listItem.innerHTML = `<strong>${data.username}</strong> ${verifiedBadge} - ${data.btc} BTC`;
                 leaderboardList.appendChild(listItem);
             });
         }, (error) => {
@@ -296,6 +296,8 @@ firebase.auth().setPersistence(firebase.auth.Auth.Persistence.LOCAL)
     
     // Load leaderboard when page opens
     document.addEventListener("DOMContentLoaded", displayLeaderboard);
+    
+    
     
     
     

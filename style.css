@@ -22,6 +22,9 @@ nav {
     align-items: center;
     display: none;
 }
+h2{
+    font-size: 15px;
+}
 #user-photo {
     width: 40px;
     height: 40px;
@@ -34,7 +37,18 @@ nav {
 }
 #logout-btn {
     display: none;
-    margin-left: 10px;
+    margin-left: 5px;
+    width: max-content;
+    font-size: 15px;
+}
+.login{
+    width: max-content;
+    font-size: 15px;
+}
+.leaderboard-refresh{
+    font-size: 13px;
+    color: gray;
+    margin-top: 1.5rem;
 }
 #game-container {
     max-width: 400px;
@@ -102,10 +116,11 @@ h1{
         font-size: 15px;
     }
     .login{
-        width: 165px;
+        width: max-content;
         font-size: 15px;
     }
     .log-out{
-        width: 100px;
+        width: max-content;
+        font-size: 15px;
     }
 }
