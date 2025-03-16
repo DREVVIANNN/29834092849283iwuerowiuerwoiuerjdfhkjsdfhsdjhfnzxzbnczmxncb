@@ -28,9 +28,9 @@
                 
                 <div id="game-container">
                     <h1>BitDTycoon Inc.</h1>
-                    <p>Bitcoin: <span id="bitcoin">0</span> BTC</p>
-                    <button id="mine-btn">Mine Bitcoin</button>
-                    <button id="upgrade-btn">Upgrade Mining (Cost: <span id="upgrade-cost">10</span> BTC)</button>
+                    <p>BitDrevv: <span id="bitdrevv">0</span></p>
+                    <button id="mine-btn">Mine BitDrevv</button>
+                    <button id="upgrade-btn">Upgrade Mining (Cost: <span id="upgrade-cost">10</span> BTD)</button>
                 </div>
 
                 <div id="game-container">
@@ -44,10 +44,22 @@
                 </div>
 
                 <div id="leaderboard-container">
-                    <h2>Leaderboard</h2>
+                    <h2>Leaderboard <i class="ri-vip-crown-fill"></i></h2>
                     <ul id="leaderboard-list"></ul>
                     <p class="leaderboard-refresh">Automatically refresh after 7 days.</p>
                 </div>
+
+                <div id="email-container">
+    <h2 class="email-title">Email Messages</h2>
+    <ul id="email-list"></ul>
+</div>
+
+<!-- Only show this if the logged-in user is the developer -->
+<div id="send-email-container" style="display: none;">
+    <textarea id="email-message" placeholder="Enter message"></textarea>
+    <button class="send-button" onclick="sendEmail()">Send</button>
+</div>
+
             </div>
         </div>
     </div>

@@ -1,17 +1,17 @@
-    let bitcoin = 0;
+    let bitdrevv = 0;
         let upgradeCost = 10;
         let miningPower = 1;
         let user = null;
 
         document.getElementById("mine-btn").addEventListener("click", () => {
-            bitcoin += 1 * miningPower;
+            bitdrevv += 1 * miningPower;
             updateUI();
             saveUserData();
         });
 
         document.getElementById("upgrade-btn").addEventListener("click", () => {
-            if (bitcoin >= upgradeCost) {
-                bitcoin -= upgradeCost;
+            if (bitdrevv >= upgradeCost) {
+                bitdrevv -= upgradeCost;
                 miningPower++;
                 upgradeCost = Math.ceil(upgradeCost * 1.5);
                 updateUI();
@@ -20,7 +20,7 @@
         });
 
         function updateUI() {
-            document.getElementById("bitcoin").textContent = bitcoin;
+            document.getElementById("bitdrevv").textContent = bitdrevv;
             document.getElementById("upgrade-cost").textContent = upgradeCost;
         }
 
@@ -28,7 +28,7 @@
             if (auth.currentUser) {
                 const userRef = db.collection("users").doc(user.uid);
                 user && user.uid && db.collection("users").doc(user.uid).set({
-                    bitcoin: bitcoin,
+                    bitdrevv: bitdrevv,
                     upgradeCost: upgradeCost,
                     miningPower: miningPower
                 });
@@ -41,7 +41,7 @@
                 userRef.get().then((doc) => {
                     if (doc.exists) {
                         let data = doc.data();
-                        bitcoin = data.bitcoin || 0;
+                        bitdrevv = data.bitdrevv || 0;
                         coins = data.coins || 0;
                         upgradeCost = data.upgradeCost || 10;
                         miningPower = data.miningPower || 1;
@@ -89,7 +89,7 @@
                         loadUserData();
                     } else {
                         // 🚀 Transfer guest progress to Firestore if available
-                        bitcoin = parseInt(localStorage.getItem("bitcoin")) || 50; // New users get 50 BTC
+                        bitdrevv = parseInt(localStorage.getItem("bitdrevv")) || 50; // New users get 50 BTD
                         upgradeCost = parseInt(localStorage.getItem("upgradeCost")) || 10;
                         miningPower = parseInt(localStorage.getItem("miningPower")) || 1;
         
@@ -104,7 +104,7 @@
         document.getElementById("logout-btn").addEventListener("click", () => {
             firebase.auth().signOut().then(() => {
                 user = null;
-                bitcoin = 0;
+                bitdrevv = 0;
                 upgradeCost = 10;
                 miningPower = 1;
                 updateUI();
@@ -119,7 +119,7 @@
                 userRef.get().then((doc) => {
                     if (doc.exists) {
                         let data = doc.data();
-                        bitcoin = data.bitcoin || 0;
+                        bitdrevv = data.bitdrevv || 0;
                         coins = data.coins || 0;
                         upgradeCost = data.upgradeCost || 10;
                         miningPower = data.miningPower || 1;
@@ -158,7 +158,7 @@
                             if (!doc.exists) {
                                 userRef.set({
                                     username: user.displayName || "Anonymous",
-                                    btc: 0,  
+                                    btd: 0,  
                                     verified: false  // Default: Not verified
                                 });
                             }
@@ -176,7 +176,7 @@
                 console.log("📤 Saving progress for user:", user.uid);
         
                 db.collection("users").doc(user.uid).set({
-                    bitcoin: bitcoin,
+                    bitdrevv: bitdrevv,
                     upgradeCost: upgradeCost,
                     miningPower: miningPower,
                 }).then(() => {
@@ -186,7 +186,7 @@
                 });
             } else {
                 console.log("🟡 No logged-in user. Saving progress to local storage...");
-                localStorage.setItem("bitcoin", bitcoin);
+                localStorage.setItem("bitdrevv", bitdrevv);
                 localStorage.setItem("upgradeCost", upgradeCost);
                 localStorage.setItem("miningPower", miningPower);
             }
@@ -238,7 +238,7 @@ firebase.auth().setPersistence(firebase.auth.Auth.Persistence.LOCAL)
             console.log("🟡 No user logged in. Loading guest progress...");
     
             // Load progress from Local Storage for guests
-            bitcoin = parseInt(localStorage.getItem("bitcoin")) || 0;
+            bitdrevv = parseInt(localStorage.getItem("bitdrevv")) || 0;
             upgradeCost = parseInt(localStorage.getItem("upgradeCost")) || 10;
             miningPower = parseInt(localStorage.getItem("miningPower")) || 1;
     
@@ -246,11 +246,11 @@ firebase.auth().setPersistence(firebase.auth.Auth.Persistence.LOCAL)
         }
     });
 
-    function mineBitcoin() {
-        let bitcoin = parseInt(localStorage.getItem("bitcoin") || "0");
-        bitcoin += 10; 
-        localStorage.setItem("bitcoin", bitcoin);
-        document.getElementById("bitcoin").textContent = bitcoin;
+    function mineBitdrevv() {
+        let bitdrevv = parseInt(localStorage.getItem("bitdrevv") || "0");
+        bitdrevv += 10; 
+        localStorage.setItem("bitdrevv", bitdrevv);
+        document.getElementById("bitdrevv").textContent = bitdrevv;
     
         const user = firebase.auth().currentUser;
         if (user) {
@@ -261,7 +261,7 @@ firebase.auth().setPersistence(firebase.auth.Auth.Persistence.LOCAL)
                     let data = doc.data();
                     userRef.set({
                         username: user.displayName || "Anonymous",
-                        btc: bitcoin,
+                        btd: bitdrevv,
                         verified: data.verified || false // Keep the verified status
                     }, { merge: true });
                 }
@@ -273,7 +273,7 @@ firebase.auth().setPersistence(firebase.auth.Auth.Persistence.LOCAL)
     
 
     function displayLeaderboard() {
-        const leaderboardRef = db.collection("leaderboard").orderBy("btc", "desc");
+        const leaderboardRef = db.collection("leaderboard").orderBy("btd", "desc");
     
         leaderboardRef.onSnapshot((snapshot) => {
             const leaderboardList = document.getElementById("leaderboard-list");
@@ -286,7 +286,7 @@ firebase.auth().setPersistence(firebase.auth.Auth.Persistence.LOCAL)
                 // Check if user is verified
                 const verifiedBadge = data.verified ? '<span id="verified-badge"><i class="ri-verified-badge-fill"></i></span>' : "";
     
-                listItem.innerHTML = `<strong>${data.username}</strong> ${verifiedBadge} - ${data.btc} BTC`;
+                listItem.innerHTML = `<strong>${data.username}</strong> ${verifiedBadge} - ${data.btd} BTD`;
                 leaderboardList.appendChild(listItem);
             });
         }, (error) => {
@@ -299,7 +299,73 @@ firebase.auth().setPersistence(firebase.auth.Auth.Persistence.LOCAL)
     
     
     
-    
+    const emailRef = db.collection("emails");
+
+// Check if logged-in user is the developer
+firebase.auth().onAuthStateChanged((user) => {
+    if (user && user.email === "fazrelmsyamil@gmail.com") {
+        document.getElementById("send-email-container").style.display = "block";
+    }
+});
+
+// Function to send email (only for the developer)
+function sendEmail() {
+    const message = document.getElementById("email-message").value;
+    if (!message) return;
+
+    const user = firebase.auth().currentUser;
+
+    emailRef.add({
+        username: "DREVVIANN.",
+        verified: true,
+        message: message,
+        photoURL: user.photoURL || "", // Store developer's profile picture
+        timestamp: firebase.firestore.FieldValue.serverTimestamp()
+    }).then(() => {
+        document.getElementById("email-message").value = "";
+        alert("Message sent to all players!");
+    });
+}
+
+// Function to display emails in real-time
+function loadEmails() {
+    emailRef.orderBy("timestamp", "desc").onSnapshot((snapshot) => {
+        const emailList = document.getElementById("email-list");
+        emailList.innerHTML = "";
+        snapshot.forEach((doc) => {
+            const data = doc.data();
+            const listItem = document.createElement("li");
+
+            // Format the timestamp
+            const date = data.timestamp ? new Date(data.timestamp.toDate()).toLocaleString() : "Just now";
+
+            // Create the username with the verified badge
+            let usernameHTML = `<strong>${data.username}</strong>`;
+            if (data.verified) {
+                usernameHTML += ' <span class="verified-badge">✔</span>';
+            }
+
+            // Set the content with profile picture
+            listItem.innerHTML = `
+                <div class="email-header">
+                    <img class="user-photo" src="${data.photoURL || 'default-avatar.png'}" alt="Profile">
+                    <div>
+                        <span>${usernameHTML}</span>
+                        <small>${date}</small>
+                    </div>
+                </div>
+                <p>${data.message}</p>
+            `;
+            emailList.appendChild(listItem);
+        });
+    });
+}
+
+// Load emails on page load
+document.addEventListener("DOMContentLoaded", loadEmails);
+
+
+      
     
     
     

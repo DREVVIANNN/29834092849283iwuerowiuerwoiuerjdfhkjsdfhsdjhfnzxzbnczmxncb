@@ -66,7 +66,12 @@ h2{
 #verified-badge {
     color: #1DA1F2; /* Twitter Blue */
     font-weight: bold;
-    margin-left: 5px;
+    margin-left: 3px;
+    margin-right: 5px;
+}
+
+.ri-vip-crown-fill{
+    color: gold;
 }
 
 button {
@@ -89,6 +94,63 @@ h1{
 .info{
     text-decoration: underline;
 }
+.email-title{
+    text-align: center;
+}
+#email-container {
+    margin-top: 20px;
+    padding: 20px;
+    background: #222;
+    border-radius: 10px;
+    text-align: left;
+    max-width: 400px;
+    margin-left: auto;
+    margin-right: auto;
+    text-align: left;
+}
+#email-list {
+    list-style: none;
+    padding: 0;
+}
+
+#email-list li {
+    padding: 10px;
+    border-bottom: 1px solid #333;
+}
+
+#send-email-container {
+    margin-top: 20px;
+    padding: 20px;
+    background: #222;
+    border-radius: 10px;
+    text-align: left;
+    max-width: 400px;
+    margin-left: auto;
+    margin-right: auto;
+    text-align: center;
+}
+
+.email-header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.user-photo {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+}
+
+textarea {
+    width: 400px;
+    height: 100px;
+    padding: 20px 20px 35px;
+    resize: none;
+    font-family: sans-serif;
+    border-radius: 5px;
+    overflow: hidden;
+}
 #leaderboard-container {
     margin-top: 20px;
     padding: 20px;
@@ -99,6 +161,13 @@ h1{
     margin-left: auto;
     margin-right: auto;
     text-align: center;
+}
+.send-button{
+    justify-self: center;
+    display: grid;
+    justify-content: center;
+    position: relative;
+    width: 390px;
 }
 #leaderboard h2 {
     text-align: center;
@@ -111,7 +180,11 @@ h1{
     padding: 8px;
     border-bottom: 1px solid #444;
 }
-@media (max-width: 768px) {
+
+@media (max-width: 765px) {
+    .container{
+        width: 400px;
+    }
     h2{
         font-size: 15px;
     }
@@ -122,5 +195,13 @@ h1{
     .log-out{
         width: max-content;
         font-size: 15px;
+    }
+
+    textarea {
+        width: 300px;
+    }
+
+    .send-button{
+        width: 350px;
     }
 }
