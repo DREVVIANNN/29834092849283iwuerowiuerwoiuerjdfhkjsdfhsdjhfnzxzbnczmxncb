@@ -28,22 +28,24 @@
                 
                 <div id="game-container">
                     <h1>BitDTycoon Inc.</h1>
-                    <p><b>BTD: </b> <span id="bitdrevv">0</span>🟡</p>
+                    <p> <b>BTD: </b> <span id="bitdrevv">0</span>🟡</p>
                     <button id="mine-btn">Mine BitDrevv</button>
                     <button id="upgrade-btn">Upgrade Mining (Cost: <span id="upgrade-cost">10</span> BTD)</button>
                 </div>
-
-                <div id="profile-container">
-                    <h1>👤 Profile</h1>
-                    <div class="profile-info">
-                        <img id="user-photo" src="" alt="Profile" width="40px" height="40px">
-                        <p><strong>Username:</strong> <span id="profile-username">Loading...</span></p>
-                        <p><strong>BTD:</strong> <span id="bitdrevv">0</span> BTD</p>
-                        <span id="verified-badge" style="color: goldenrod; font-weight: bold; display: none;"><i class="ri-verified-badge-fill"></i></span>
+                
+                <div class="chat-container">
+                    <!-- Search Box -->
+                    <input type="text" id="searchUser" placeholder="Search user..." oninput="searchUsers()">
+                    <div id="userList"></div>
+                
+                    <!-- Chat Window -->
+                    <div id="chatWindow" class="hidden">
+                        <h3 id="chatUser"></h3>
+                        <div id="messagesContainer"></div>
+                        <input type="text" id="messageInput" placeholder="Type a message...">
+                        <button onclick="sendMessage()">Send</button>
                     </div>
                 </div>
-                
-                
 
                 <div id="game-container">
                     <h1 class="info">Info</h1>

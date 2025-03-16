@@ -415,36 +415,94 @@ function loadEmails() {
 document.addEventListener("DOMContentLoaded", loadEmails);
 
 
-      
-function loadUserProfile() {
-    const user = firebase.auth().currentUser;
-    if (!user) return; // No user logged in
 
-    const userRef = db.collection("users").doc(user.uid);
+let selectedUserId = null; // Store selected user ID
 
-    userRef.get().then((doc) => {
-        if (doc.exists) {
-            let userData = doc.data();
-            document.getElementById("profile-username").textContent = userData.username;
-            document.getElementById("bitdrevv").textContent = userData.bitdrevv || 0;
-            document.getElementById("profile-pic").src = userData.photoURL || "default-avatar.png";
+function searchUsers() {
+    let query = document.getElementById("searchUser").value.toLowerCase();
+    let userList = document.getElementById("userList");
+    userList.innerHTML = ""; // Clear previous results
 
-            if (userData.verified) {
-                document.getElementById("verified-badge").style.display = "block";
+    db.collection("users").get().then(snapshot => {
+        snapshot.forEach(doc => {
+            let user = doc.data();
+            if (user.username.toLowerCase().includes(query)) {
+                let userElement = document.createElement("div");
+                userElement.innerHTML = `
+                    <img src="${user.photoURL}" width="30" height="30"> 
+                    <span>${user.username}</span>
+                `;
+                userElement.onclick = () => openChat(user.uid, user.username);
+                userList.appendChild(userElement);
             }
-        }
-    }).catch((error) => {
-        console.error("Error loading user profile:", error);
+        });
+    }).catch(error => {
+        console.error("Error fetching users:", error);
     });
 }
 
-// Call this function after user logs in
+
+// Function to open chat with user
+function openChat(userId, username) {
+    selectedUserId = userId;
+    document.getElementById("chatUser").textContent = username;
+    document.getElementById("chatWindow").classList.remove("hidden");
+    loadMessages();
+}
+
+// Function to send message
+function sendMessage() {
+    let message = document.getElementById("messageInput").value;
+    if (!message || !selectedUserId) return;
+
+    let user = auth.currentUser;
+
+    db.collection("messages").add({
+        senderId: user.uid,
+        receiverId: selectedUserId,
+        message: message,
+        timestamp: firebase.firestore.FieldValue.serverTimestamp()
+    });
+
+    document.getElementById("messageInput").value = ""; // Clear input
+}
+
+// Function to load messages in real-time
+function loadMessages() {
+    let user = auth.currentUser;
+
+    db.collection("messages")
+      .where("senderId", "in", [user.uid, selectedUserId])
+      .where("receiverId", "in", [user.uid, selectedUserId])
+      .orderBy("timestamp")
+      .onSnapshot(snapshot => {
+        let messagesContainer = document.getElementById("messagesContainer");
+        messagesContainer.innerHTML = "";
+
+        snapshot.forEach(doc => {
+            let data = doc.data();
+            let msgDiv = document.createElement("div");
+            msgDiv.textContent = data.message;
+            msgDiv.style.color = data.senderId === user.uid ? "cyan" : "white";
+            messagesContainer.appendChild(msgDiv);
+        });
+    });
+}
+  
 firebase.auth().onAuthStateChanged((user) => {
     if (user) {
-        loadUserProfile();
+        const userRef = db.collection("users").doc(user.uid);
+        userRef.get().then((doc) => {
+            if (!doc.exists) {
+                userRef.set({
+                    uid: user.uid,
+                    username: user.displayName,
+                    photoURL: user.photoURL
+                });
+            }
+        });
     }
 });
-
-    
+ 
     
     

@@ -74,25 +74,25 @@ h2{
     margin-right: 5px;
 }
 
-#profile-container {
+.chat-container {
+    max-width: 450px;
+    margin: auto;
+    padding: 10px;
     background: #222;
     color: white;
-    padding: 15px;
     border-radius: 10px;
-    max-width: 400px;
-    text-align: center;
-    box-shadow: 0 0 10px rgba(255, 255, 255, 0.2);
+}
+#userList div {
+    padding: 5px;
+    cursor: pointer;
+}
+.hidden {
+    display: none;
 }
 
-.profile-info img {
-    width: 80px;
-    height: 80px;
-    border-radius: 50%;
-    margin-bottom: 10px;
-}
 
 #verified-badge {
-    color: gold;
+    color: goldenrod;
     font-weight: bold;
 }
 
