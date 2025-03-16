@@ -334,53 +334,56 @@ function loveMessage(emailId) {
         return;
     }
 
-    const userId = user.uid;
     const emailRef = db.collection("emails").doc(emailId);
 
-    emailRef.get().then((doc) => {
-        if (doc.exists) {
-            const emailData = doc.data();
-            let loves = emailData.loves || {};
-
-            if (loves[userId]) {
-                // User already loved this message, so we remove their love
-                delete loves[userId];
-            } else {
-                // User hasn't loved this message, so we add their love
-                loves[userId] = true;
+    db.runTransaction((transaction) => {
+        return transaction.get(emailRef).then((doc) => {
+            if (!doc.exists) {
+                throw "Document does not exist!";
             }
 
-            emailRef.update({ loves }).then(() => {
-                console.log("Love updated successfully!");
-            }).catch((error) => {
-                console.error("Error updating love:", error);
-            });
-        }
+            let currentLoves = doc.data().loves || 0;
+            let lovesByUsers = doc.data().lovedBy || {}; // Track who loved
+
+            if (lovesByUsers[user.uid]) {
+                // User already loved this message, so we remove their love
+                currentLoves -= 1;
+                delete lovesByUsers[user.uid];
+            } else {
+                // User hasn't loved this message, so we add their love
+                currentLoves += 1;
+                lovesByUsers[user.uid] = true;
+            }
+
+            // Update Firestore
+            transaction.update(emailRef, { loves: currentLoves, lovedBy: lovesByUsers });
+        });
+    }).catch((error) => {
+        console.error("Error updating love:", error);
     });
 }
 
 
+
 function loadEmails() {
-    emailRef.orderBy("timestamp", "desc").onSnapshot((snapshot) => {
+    db.collection("emails").orderBy("timestamp", "desc").onSnapshot((snapshot) => {
         const emailList = document.getElementById("email-list");
         emailList.innerHTML = ""; // Clear previous messages
 
         snapshot.forEach((doc) => {
             const data = doc.data();
-            const loveCount = data.loves ? Object.keys(data.loves).length : 0;
+
+            // ✅ FIX: Get the correct love count
+            let loveCount = data.lovedBy ? Object.keys(data.lovedBy).length : 0;
 
             const listItem = document.createElement("li");
 
-            // Format timestamp
             const date = data.timestamp ? new Date(data.timestamp.toDate()).toLocaleString() : "Just now";
-
-            // Create verified username
             let usernameHTML = `<strong>${data.username}</strong>`;
             if (data.verified) {
                 usernameHTML += '<span id="verified-badge"><i class="ri-verified-badge-fill"></i></span>';
             }
 
-            // Create message structure with the love button at the bottom
             listItem.innerHTML = `
                 <div class="email-header">
                     <img class="user-photo" src="${data.photoURL || 'default-avatar.png'}" alt="Profile">
@@ -391,7 +394,7 @@ function loadEmails() {
                 </div>
                 <p class="email-message">${data.message}</p>
                 <a class="love-btn" onclick="loveMessage('${doc.id}')">
-                    <i class="ri-heart-fill"></i> <span id="love-count-${doc.id}">${loveCount}</span>
+                   <i class="ri-heart-fill"></i>  <span id="love-count-${doc.id}">${loveCount}</span>
                 </a>
             `;
 
@@ -399,6 +402,8 @@ function loadEmails() {
         });
     });
 }
+
+
 
 
 
