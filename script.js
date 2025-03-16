@@ -310,14 +310,20 @@ firebase.auth().onAuthStateChanged((user) => {
 
 // Function to send email (only for the developer)
 function sendEmail() {
-    const message = document.getElementById("email-message").value;
-    if (!message) return;
+    const message = document.getElementById("email-message").value.trim();
+    if (!message) return; // Prevent empty messages
 
     const user = firebase.auth().currentUser;
+    if (!user || user.email !== "fazrelmsyamil@gmail.com") {
+        alert("Only the developer can send messages!");
+        return;
+    }
+
+    const emailRef = db.collection("emails"); // Ensure correct Firestore reference
 
     emailRef.add({
         username: user.displayName,
-        photoURL: user.photoURL,
+        photoURL: user.photoURL || "default-avatar.png", // Fallback if no photo
         verified: true, // Developer is verified
         timestamp: firebase.firestore.FieldValue.serverTimestamp(),
         message: message,
@@ -330,6 +336,7 @@ function sendEmail() {
         console.error("Error sending email:", error);
     });
 }
+
 
 function loveMessage(emailId) {
     const user = firebase.auth().currentUser;
