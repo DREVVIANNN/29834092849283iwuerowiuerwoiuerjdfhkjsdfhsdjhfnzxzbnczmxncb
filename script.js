@@ -327,33 +327,39 @@ function sendEmail() {
     });
 }
 
-// Function to love a message
 function loveMessage(emailId) {
     const user = firebase.auth().currentUser;
     if (!user) {
-        alert("You must be logged in to love messages!");
+        alert("You need to log in to love messages!");
         return;
     }
 
-    const emailDoc = emailRef.doc(emailId);
-    
-    // Ensure unique loves per user
-    emailDoc.get().then((doc) => {
+    const userId = user.uid;
+    const emailRef = db.collection("emails").doc(emailId);
+
+    emailRef.get().then((doc) => {
         if (doc.exists) {
-            let data = doc.data();
-            let loves = data.loves || {};
-            
-            if (loves[user.uid]) {
-                alert("You already loved this message!");
+            const emailData = doc.data();
+            let loves = emailData.loves || {};
+
+            if (loves[userId]) {
+                // User already loved this message, so we remove their love
+                delete loves[userId];
             } else {
-                loves[user.uid] = true; // Mark as loved
-                emailDoc.update({ loves }).catch(error => console.error("Error loving message:", error));
+                // User hasn't loved this message, so we add their love
+                loves[userId] = true;
             }
+
+            emailRef.update({ loves }).then(() => {
+                console.log("Love updated successfully!");
+            }).catch((error) => {
+                console.error("Error updating love:", error);
+            });
         }
     });
 }
 
-// Function to display emails in real-time
+
 function loadEmails() {
     emailRef.orderBy("timestamp", "desc").onSnapshot((snapshot) => {
         const emailList = document.getElementById("email-list");
@@ -393,6 +399,7 @@ function loadEmails() {
         });
     });
 }
+
 
 
 // Load emails on page load
