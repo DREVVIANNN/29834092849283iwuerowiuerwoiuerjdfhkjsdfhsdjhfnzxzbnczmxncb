@@ -303,37 +303,21 @@ firebase.auth().setPersistence(firebase.auth.Auth.Persistence.LOCAL)
 
 // Check if logged-in user is the developer
 firebase.auth().onAuthStateChanged((user) => {
-    const emailContainer = document.getElementById("send-email-container");
-
-    if (user) {
-        // Check if the logged-in user is the developer
-        if (user.email === "fazrelmsyamil@gmail.com") {
-            emailContainer.style.display = "block";  // Show email container
-        } else {
-            emailContainer.style.display = "none";   // Hide for other users
-        }
-    } else {
-        emailContainer.style.display = "none";       // Hide when logged out
+    if (user && user.email === "fazrelmsyamil@gmail.com") {
+        document.getElementById("send-email-container").style.display = "block";
     }
 });
 
-
 // Function to send email (only for the developer)
 function sendEmail() {
-    const message = document.getElementById("email-message").value.trim();
-    if (!message) return; // Prevent empty messages
+    const message = document.getElementById("email-message").value;
+    if (!message) return;
 
     const user = firebase.auth().currentUser;
-    if (!user || user.email !== "fazrelmsyamil@gmail.com") {
-        alert("Only the developer can send messages!");
-        return;
-    }
-
-    const emailRef = db.collection("emails"); // Ensure correct Firestore reference
 
     emailRef.add({
-        username: user.displayName,
-        photoURL: user.photoURL || "default-avatar.png", // Fallback if no photo
+         username: user.displayName,
+        photoURL: user.photoURL,
         verified: true, // Developer is verified
         timestamp: firebase.firestore.FieldValue.serverTimestamp(),
         message: message,
@@ -347,48 +331,41 @@ function sendEmail() {
     });
 }
 
-
-// Function to like/unlike a developer message
-function loveMessage(emailID) {
+function loveMessage(emailId) {
     const user = firebase.auth().currentUser;
     if (!user) {
-        alert("You need to log in to like messages!");
+        alert("You need to log in to love messages!");
         return;
     }
 
-    const emailRef = db.collection("emails").doc(emailID);
+    const emailRef = db.collection("emails").doc(emailId);
 
-    db.runTransaction((transaction) => {
-        return transaction.get(emailRef).then((doc) => {
-            if (!doc.exists) {
-                throw "Document does not exist!";
-            }
+    db.runTransaction(async (transaction) => {
+        const doc = await transaction.get(emailRef);
+        if (!doc.exists) {
+            throw "Document does not exist!";
+        }
 
-            let data = doc.data();
-            let lovedByUsers = data.lovedBy || {}; // Track users who liked the message
-            let currentLoves = data.loves || 0;
+        let data = doc.data();
+        let lovesByUsers = data.lovedBy || {}; // Track loves
+        let currentLoves = data.loves || 0;
 
-            if (lovedByUsers[user.uid]) {
-                // User already liked, so remove the like
-                delete lovedByUsers[user.uid];
-                currentLoves -= 1;
-            } else {
-                // User hasn't liked, so add the like
-                lovedByUsers[user.uid] = true;
-                currentLoves += 1;
-            }
+        if (lovesByUsers[user.uid]) {
+            // User already loved it, so remove
+            delete lovesByUsers[user.uid];
+            currentLoves--;
+        } else {
+            // User hasn't loved it, so add
+            lovesByUsers[user.uid] = true;
+            currentLoves++;
+        }
 
-            // Update Firestore with new like count
-            transaction.update(emailRef, {
-                loves: currentLoves,
-                lovedBy: lovedByUsers
-            });
-        });
+        // Update Firestore
+        transaction.update(emailRef, { loves: currentLoves, lovedBy: lovesByUsers });
     }).catch((error) => {
         console.error("Error updating love:", error);
     });
 }
-
 
 
 
@@ -439,7 +416,35 @@ document.addEventListener("DOMContentLoaded", loadEmails);
 
 
       
-    
+function loadUserProfile() {
+    const user = firebase.auth().currentUser;
+    if (!user) return; // No user logged in
+
+    const userRef = db.collection("users").doc(user.uid);
+
+    userRef.get().then((doc) => {
+        if (doc.exists) {
+            let userData = doc.data();
+            document.getElementById("profile-username").textContent = userData.username;
+            document.getElementById("bitdrevv").textContent = userData.bitdrevv || 0;
+            document.getElementById("profile-pic").src = userData.photoURL || "default-avatar.png";
+
+            if (userData.verified) {
+                document.getElementById("verified-badge").style.display = "block";
+            }
+        }
+    }).catch((error) => {
+        console.error("Error loading user profile:", error);
+    });
+}
+
+// Call this function after user logs in
+firebase.auth().onAuthStateChanged((user) => {
+    if (user) {
+        loadUserProfile();
+    }
+});
+
     
     
     

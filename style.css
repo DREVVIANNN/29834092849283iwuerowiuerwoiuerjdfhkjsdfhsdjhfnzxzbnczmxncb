@@ -74,6 +74,31 @@ h2{
     margin-right: 5px;
 }
 
+#profile-container {
+    background: #222;
+    color: white;
+    padding: 15px;
+    border-radius: 10px;
+    max-width: 400px;
+    text-align: center;
+    box-shadow: 0 0 10px rgba(255, 255, 255, 0.2);
+}
+
+.profile-info img {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    margin-bottom: 10px;
+}
+
+#verified-badge {
+    color: gold;
+    font-weight: bold;
+}
+
+
+
+
 .ri-vip-crown-fill{
     color: gold;
 }
