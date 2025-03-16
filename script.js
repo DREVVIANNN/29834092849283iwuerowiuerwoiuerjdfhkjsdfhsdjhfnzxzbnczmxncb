@@ -316,14 +316,18 @@ function sendEmail() {
     const user = firebase.auth().currentUser;
 
     emailRef.add({
-        username: "DREVVIANN.",
-        verified: true,
+        username: user.displayName,
+        photoURL: user.photoURL,
+        verified: true, // Developer is verified
+        timestamp: firebase.firestore.FieldValue.serverTimestamp(),
         message: message,
-        photoURL: user.photoURL || "", // Store developer's profile picture
-        timestamp: firebase.firestore.FieldValue.serverTimestamp()
+        loves: 0,
+        lovedBy: {}
     }).then(() => {
         document.getElementById("email-message").value = "";
-        alert("Message sent to all players!");
+        alert("Email sent to all players!");
+    }).catch((error) => {
+        console.error("Error sending email:", error);
     });
 }
 
