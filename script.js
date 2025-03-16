@@ -423,22 +423,40 @@ function searchUsers() {
     let userList = document.getElementById("userList");
     userList.innerHTML = ""; // Clear previous results
 
-    db.collection("users").get().then(snapshot => {
-        snapshot.forEach(doc => {
-            let user = doc.data();
-            if (user.username.toLowerCase().includes(query)) {
-                let userElement = document.createElement("div");
-                userElement.innerHTML = `
-                    <img src="${user.photoURL}" width="30" height="30"> 
-                    <span>${user.username}</span>
-                `;
-                userElement.onclick = () => openChat(user.uid, user.username);
-                userList.appendChild(userElement);
-            }
+    db.collection("users").get()
+        .then(snapshot => {
+            snapshot.forEach(doc => {
+                let user = doc.data();
+                if (user.username.toLowerCase().includes(query)) {
+                    let userElement = document.createElement("div");
+                    userElement.innerHTML = `
+                        <img src="${user.photoURL}" width="30" height="30"> 
+                        <span>${user.username}</span>
+                    `;
+                    userElement.onclick = () => openChat(user.uid, user.username);
+                    userList.appendChild(userElement);
+                }
+            });
+        })
+        .catch(error => {
+            console.error("Error fetching users:", error);
         });
-    }).catch(error => {
-        console.error("Error fetching users:", error);
-    });
+}
+
+function getUserData(userId) {
+    db.collection("users").doc(userId).get()
+        .then(doc => {
+            if (doc.exists) {
+                let data = doc.data();
+                console.log("Username:", data.username);
+                console.log("Photo:", data.photoURL);
+            } else {
+                console.log("No user found!");
+            }
+        })
+        .catch(error => {
+            console.error("Error fetching user:", error);
+        });
 }
 
 
@@ -492,17 +510,26 @@ function loadMessages() {
 firebase.auth().onAuthStateChanged((user) => {
     if (user) {
         const userRef = db.collection("users").doc(user.uid);
+
         userRef.get().then((doc) => {
             if (!doc.exists) {
                 userRef.set({
                     uid: user.uid,
                     username: user.displayName,
                     photoURL: user.photoURL
+                }).then(() => {
+                    console.log("User data saved to Firestore");
+                }).catch(error => {
+                    console.error("Error saving user:", error);
                 });
             }
+        }).catch(error => {
+            console.error("Error checking user:", error);
         });
     }
 });
+
+
  
     
     
