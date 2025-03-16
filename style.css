@@ -8,6 +8,8 @@ body {
     padding: 20px;
 }
 nav {
+    position: sticky;
+    top: 0;
     background: #222;
     padding: 15px;
     display: flex;
@@ -16,6 +18,7 @@ nav {
     align-items: center;
     padding: 0 20px;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    z-index: 1000;
 }
 #user-info {
     display: flex;
@@ -142,14 +145,58 @@ h1{
     border-radius: 50%;
 }
 
+.email-message {
+    margin-bottom: 10px;
+    font-size: 16px;
+}
+
+.love-btn {
+    background: #444;
+    border: none;
+    color: #f00;
+    font-size: 16px;
+    cursor: pointer;
+    width: 55px;
+    text-align: center;
+    border-radius: 5px;
+    display: block;
+    margin-top: 5px;
+}
+
 textarea {
-    width: 400px;
+    width: 300px;
     height: 100px;
     padding: 20px 20px 35px;
     resize: none;
     font-family: sans-serif;
     border-radius: 5px;
     overflow: hidden;
+}
+#ban-container{
+    margin-top: 20px;
+    padding: 20px;
+    background: #222;
+    border-radius: 10px;
+    text-align: left;
+    max-width: 400px;
+    margin-left: auto;
+    margin-right: auto;
+    text-align: center;
+}
+#ban-username{
+    width: 300px;
+    height: 30px;
+    resize: none;
+    font-family: sans-serif;
+    border-radius: 5px;
+    overflow: hidden;
+}
+.banUser{
+    justify-self: center;
+    display: grid;
+    justify-content: center;
+    position: relative;
+    width: 305px;
 }
 #leaderboard-container {
     margin-top: 20px;
@@ -167,7 +214,7 @@ textarea {
     display: grid;
     justify-content: center;
     position: relative;
-    width: 390px;
+    width: 350px;
 }
 #leaderboard h2 {
     text-align: center;

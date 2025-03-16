@@ -301,29 +301,29 @@ firebase.auth().setPersistence(firebase.auth.Auth.Persistence.LOCAL)
     
     const emailRef = db.collection("emails");
 
-// Check if logged-in user is the developer
-firebase.auth().onAuthStateChanged((user) => {
-    if (user && user.email === "fazrelmsyamil@gmail.com") {
-        document.getElementById("send-email-container").style.display = "block";
-    }
-});
-
-// Function to send email (only for the developer)
-function sendEmail() {
-    const message = document.getElementById("email-message").value;
-    if (!message) return;
-
+// Function to love a message
+function loveMessage(emailId) {
     const user = firebase.auth().currentUser;
+    if (!user) {
+        alert("You must be logged in to love messages!");
+        return;
+    }
 
-    emailRef.add({
-        username: "DREVVIANN.",
-        verified: true,
-        message: message,
-        photoURL: user.photoURL || "", // Store developer's profile picture
-        timestamp: firebase.firestore.FieldValue.serverTimestamp()
-    }).then(() => {
-        document.getElementById("email-message").value = "";
-        alert("Message sent to all players!");
+    const emailDoc = emailRef.doc(emailId);
+    
+    // Ensure unique loves per user
+    emailDoc.get().then((doc) => {
+        if (doc.exists) {
+            let data = doc.data();
+            let loves = data.loves || {};
+            
+            if (loves[user.uid]) {
+                alert("You already loved this message!");
+            } else {
+                loves[user.uid] = true; // Mark as loved
+                emailDoc.update({ loves }).catch(error => console.error("Error loving message:", error));
+            }
+        }
     });
 }
 
@@ -331,21 +331,24 @@ function sendEmail() {
 function loadEmails() {
     emailRef.orderBy("timestamp", "desc").onSnapshot((snapshot) => {
         const emailList = document.getElementById("email-list");
-        emailList.innerHTML = "";
+        emailList.innerHTML = ""; // Clear previous messages
+
         snapshot.forEach((doc) => {
             const data = doc.data();
+            const loveCount = data.loves ? Object.keys(data.loves).length : 0;
+
             const listItem = document.createElement("li");
 
-            // Format the timestamp
+            // Format timestamp
             const date = data.timestamp ? new Date(data.timestamp.toDate()).toLocaleString() : "Just now";
 
-            // Create the username with the verified badge
+            // Create verified username
             let usernameHTML = `<strong>${data.username}</strong>`;
             if (data.verified) {
                 usernameHTML += '<span id="verified-badge"><i class="ri-verified-badge-fill"></i></span>';
             }
 
-            // Set the content with profile picture
+            // Create message structure with the love button at the bottom
             listItem.innerHTML = `
                 <div class="email-header">
                     <img class="user-photo" src="${data.photoURL || 'default-avatar.png'}" alt="Profile">
@@ -354,19 +357,77 @@ function loadEmails() {
                         <small>${date}</small>
                     </div>
                 </div>
-                <p>${data.message}</p>
+                <p class="email-message">${data.message}</p>
+                <a class="love-btn" onclick="loveMessage('${doc.id}')">
+                    ❤️ (<span id="love-count-${doc.id}">${loveCount}</span>)
+                </a>
             `;
+
             emailList.appendChild(listItem);
         });
     });
 }
 
+
 // Load emails on page load
 document.addEventListener("DOMContentLoaded", loadEmails);
 
 
-      
-    
+
+// Check if user is developer
+firebase.auth().onAuthStateChanged((user) => {
+    if (user && user.email === "fazrelmsyamil@gmail.com") {
+        document.getElementById("ban-container").style.display = "block"; // Show ban form
+    }
+});
+
+// Ban a user by username
+function banUser() {
+    const username = document.getElementById("ban-username").value.trim();
+    if (username === "") {
+        alert("Please enter a username!");
+        return;
+    }
+
+    db.collection("bannedUsers").doc(username).set({ banned: true })
+        .then(() => {
+            alert(`${username} has been banned.`);
+            document.getElementById("ban-username").value = ""; // Clear input
+        })
+        .catch((error) => {
+            console.error("Error banning user:", error);
+        });
+}
+
+firebase.auth().onAuthStateChanged((user) => {
+    if (user) {
+        const username = user.displayName;
+        db.collection("bannedUsers").doc(username).get()
+            .then((doc) => {
+                if (doc.exists && doc.data().banned) {
+                    document.getElementById("game-container").innerHTML = "<h2>You are banned from the game.</h2>";
+                }
+            });
+    }
+});
+
+
+ // Disable Right Click
+document.addEventListener("contextmenu", (event) => event.preventDefault());
+
+// Disable F12, Ctrl+Shift+I, Ctrl+U, Ctrl+S, Ctrl+H, etc.
+document.addEventListener("keydown", (event) => {
+    if (
+        event.key === "F12" || 
+        (event.ctrlKey && event.shiftKey && event.key === "I") || 
+        (event.ctrlKey && event.key === "U") || 
+        (event.ctrlKey && event.key === "S") || 
+        (event.ctrlKey && event.key === "H")
+    ) {
+        event.preventDefault();
+    }
+});
+   
     
     
     
