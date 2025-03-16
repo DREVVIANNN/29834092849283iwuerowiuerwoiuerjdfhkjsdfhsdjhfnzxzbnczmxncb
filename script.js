@@ -297,9 +297,33 @@ firebase.auth().setPersistence(firebase.auth.Auth.Persistence.LOCAL)
     // Load leaderboard when page opens
     document.addEventListener("DOMContentLoaded", displayLeaderboard);
     
-    
-    
     const emailRef = db.collection("emails");
+
+// Check if logged-in user is the developer
+firebase.auth().onAuthStateChanged((user) => {
+    if (user && user.email === "fazrelmsyamil@gmail.com") {
+        document.getElementById("send-email-container").style.display = "block";
+    }
+});
+
+// Function to send email (only for the developer)
+function sendEmail() {
+    const message = document.getElementById("email-message").value;
+    if (!message) return;
+
+    const user = firebase.auth().currentUser;
+
+    emailRef.add({
+        username: "Developer",
+        verified: true,
+        message: message,
+        photoURL: user.photoURL || "", // Store developer's profile picture
+        timestamp: firebase.firestore.FieldValue.serverTimestamp()
+    }).then(() => {
+        document.getElementById("email-message").value = "";
+        alert("Message sent to all players!");
+    });
+}
 
 // Function to love a message
 function loveMessage(emailId) {
