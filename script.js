@@ -297,6 +297,8 @@ firebase.auth().setPersistence(firebase.auth.Auth.Persistence.LOCAL)
     // Load leaderboard when page opens
     document.addEventListener("DOMContentLoaded", displayLeaderboard);
     
+    
+    
     const emailRef = db.collection("emails");
 
 // Check if logged-in user is the developer
@@ -314,7 +316,7 @@ function sendEmail() {
     const user = firebase.auth().currentUser;
 
     emailRef.add({
-        username: "Developer",
+        username: "DREVVIANN.",
         verified: true,
         message: message,
         photoURL: user.photoURL || "", // Store developer's profile picture
@@ -383,7 +385,7 @@ function loadEmails() {
                 </div>
                 <p class="email-message">${data.message}</p>
                 <a class="love-btn" onclick="loveMessage('${doc.id}')">
-                    <i class="ri-heart-3-fill"></i> <span id="love-count-${doc.id}">${loveCount}</span>
+                    <i class="ri-heart-fill"></i> <span id="love-count-${doc.id}">${loveCount}</span>
                 </a>
             `;
 
@@ -395,7 +397,6 @@ function loadEmails() {
 
 // Load emails on page load
 document.addEventListener("DOMContentLoaded", loadEmails);
-
 
 
       

@@ -153,7 +153,7 @@ h1{
 
 .love-btn {
     background: #444;
-    border: none;
+    border: 1px #777 solid;
     color: #fff;
     font-size: 16px;
     user-select: none;
@@ -165,15 +165,15 @@ h1{
     margin-top: 5px;
 }
 
-.ri-heart-3-fill{
+.ri-heart-fill{
     color: #f00;
     font-size: 15px;
 }
 
 textarea {
-    width: 300px;
-    height: 100px;
-    padding: 20px 20px 35px;
+    width: 200px;
+    height: 20px;
+    padding: 10px 10px 5px;
     resize: none;
     font-family: sans-serif;
     border-radius: 5px;
@@ -195,7 +195,7 @@ textarea {
     display: grid;
     justify-content: center;
     position: relative;
-    width: 350px;
+    width: 225px;
 }
 #leaderboard h2 {
     text-align: center;
