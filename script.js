@@ -303,10 +303,20 @@ firebase.auth().setPersistence(firebase.auth.Auth.Persistence.LOCAL)
 
 // Check if logged-in user is the developer
 firebase.auth().onAuthStateChanged((user) => {
-    if (user && user.email === "fazrelmsyamil@gmail.com") {
-        document.getElementById("send-email-container").style.display = "block";
+    const emailContainer = document.getElementById("send-email-container");
+
+    if (user) {
+        // Check if the logged-in user is the developer
+        if (user.email === "fazrelmsyamil@gmail.com") {
+            emailContainer.style.display = "block";  // Show email container
+        } else {
+            emailContainer.style.display = "none";   // Hide for other users
+        }
+    } else {
+        emailContainer.style.display = "none";       // Hide when logged out
     }
 });
+
 
 // Function to send email (only for the developer)
 function sendEmail() {
