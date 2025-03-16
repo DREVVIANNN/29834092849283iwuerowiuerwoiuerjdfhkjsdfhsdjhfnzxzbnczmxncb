@@ -338,41 +338,47 @@ function sendEmail() {
 }
 
 
-function loveMessage(emailId) {
+// Function to like/unlike a developer message
+function loveMessage(emailID) {
     const user = firebase.auth().currentUser;
     if (!user) {
-        alert("You need to log in to love messages!");
+        alert("You need to log in to like messages!");
         return;
     }
 
-    const emailRef = db.collection("emails").doc(emailId);
+    const emailRef = db.collection("emails").doc(emailID);
 
-    db.runTransaction(async (transaction) => {
-        const doc = await transaction.get(emailRef);
-        if (!doc.exists) {
-            throw "Document does not exist!";
-        }
+    db.runTransaction((transaction) => {
+        return transaction.get(emailRef).then((doc) => {
+            if (!doc.exists) {
+                throw "Document does not exist!";
+            }
 
-        let data = doc.data();
-        let lovesByUsers = data.lovedBy || {}; // Track loves
-        let currentLoves = data.loves || 0;
+            let data = doc.data();
+            let lovedByUsers = data.lovedBy || {}; // Track users who liked the message
+            let currentLoves = data.loves || 0;
 
-        if (lovesByUsers[user.uid]) {
-            // User already loved it, so remove
-            delete lovesByUsers[user.uid];
-            currentLoves--;
-        } else {
-            // User hasn't loved it, so add
-            lovesByUsers[user.uid] = true;
-            currentLoves++;
-        }
+            if (lovedByUsers[user.uid]) {
+                // User already liked, so remove the like
+                delete lovedByUsers[user.uid];
+                currentLoves -= 1;
+            } else {
+                // User hasn't liked, so add the like
+                lovedByUsers[user.uid] = true;
+                currentLoves += 1;
+            }
 
-        // Update Firestore
-        transaction.update(emailRef, { loves: currentLoves, lovedBy: lovesByUsers });
+            // Update Firestore with new like count
+            transaction.update(emailRef, {
+                loves: currentLoves,
+                lovedBy: lovedByUsers
+            });
+        });
     }).catch((error) => {
         console.error("Error updating love:", error);
     });
 }
+
 
 
 
