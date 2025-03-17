@@ -73,6 +73,12 @@ h2{
     margin-left: 3px;
     margin-right: 5px;
 }
+.ri-verified-badge-fill {
+    color: goldenrod; /* Twitter Blue */
+    font-weight: bold;
+    margin-left: 3px;
+    margin-right: 5px;
+}
 
 
 #verified-badge {
@@ -107,6 +113,17 @@ h2{
 }
 ::-webkit-scrollbar-thumb{
     background-color: #1e1e1e;
+}
+
+.game-container{
+    max-width: 400px;
+    margin: 20px auto;
+    padding: 20px;
+    background: #1e1e1e;
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(255, 255, 255, 0.1);
+    color: white;
+    text-align: center;
 }
 
 button {

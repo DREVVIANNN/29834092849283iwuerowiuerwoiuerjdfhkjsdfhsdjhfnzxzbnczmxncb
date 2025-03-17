@@ -425,41 +425,63 @@ function loadEmails() {
 // Load emails on page load
 document.addEventListener("DOMContentLoaded", loadEmails);
 
+firebase.auth().onAuthStateChanged((user) => {
+    if (user) {
+        checkMaintenance(); // Check if maintenance is active
+
+        // Show admin panel only for developer
+        if (user.email === "fazrelmsyamil@gmail.com") {
+            document.getElementById("admin-panel").style.display = "block";
+        }
+    }
+});
 
 
 const maintenanceRef = firebase.firestore().collection("serverStatus").doc("status");
 
 // Function to check maintenance status
 function checkMaintenance() {
-    maintenanceRef.get().then((doc) => {
-        if (doc.exists && doc.data().maintenance === true) {
-            startMaintenance();
+    db.collection("settings").doc("server").onSnapshot((doc) => {
+        if (doc.exists && doc.data().maintenance) {
+            // Hide the game and show maintenance message
+            document.body.innerHTML = `
+                <h1>⚡ Server Under Maintenance ⚡</h1>
+                <p>The game is currently undergoing maintenance. Please check back later.</p>
+                <button onclick="playMaintenanceSong()">Play Maintenance Song</button>
+            `;
+        } else {
+            // Reload the normal game UI
+            location.reload();
         }
-    }).catch((error) => {
-        console.error("Error checking maintenance status:", error);
     });
 }
 
-// Function to start maintenance
+// Run this function when the page loads
+checkMaintenance();
+
+
+
+// Function to start maintenance (Called when Firestore updates)
 function startMaintenance() {
-    // Play maintenance song
-    let audio = new Audio("Growtopia Update Song.mp3");
-    audio.play();
+    document.body.innerHTML = `
+        <div style="text-align:center; font-size:15px; margin-top:50px;">
+            <h2>🚧 Server Under Maintenance 🚧</h2>
+            <p>The game is currently undergoing maintenance. Please check back later.</p>
+            <p>~ BitDTycoon Team.<i class="ri-verified-badge-fill"></i></p>
+        </div>
+    `;
 
-    // Show maintenance message after song finishes
-    audio.onended = () => {
-        document.body.innerHTML = `
-            <div style="text-align:center; font-size:24px; margin-top:50px;">
-                <h2>🚧 Server Under Maintenance 🚧</h2>
-                <p>The game is currently undergoing maintenance. Please check back later.</p>
-            </div>
-        `;
-
-        // Stop all game interactions
-        clearInterval(miningInterval);
-        firebase.auth().signOut(); // Log out users
-    };
+    // Stop all game interactions
+    clearInterval(miningInterval); 
+    firebase.auth().signOut(); // Log out users
 }
+
+// Function to play song (user interaction required)
+function playMaintenanceSong() {
+    let audio = new Audio("Growtopia Update Song.mp3"); // Replace with your actual file URL
+    audio.play().catch(error => console.error("Autoplay failed:", error));
+}
+
 
 // Function to toggle maintenance mode (Only for Developer)
 function toggleMaintenance(status) {
@@ -470,6 +492,13 @@ function toggleMaintenance(status) {
     });
 }
 
+// Listen for Firestore changes in real-time
+maintenanceRef.onSnapshot((doc) => {
+    if (doc.exists && doc.data().maintenance === true) {
+        startMaintenance();
+    }
+});
+
 // Check maintenance status when page loads
 firebase.auth().onAuthStateChanged((user) => {
     if (user) {
@@ -477,8 +506,20 @@ firebase.auth().onAuthStateChanged((user) => {
     }
 });
 
-toggleMaintenance(true); // Start maintenance
-toggleMaintenance(false); // End maintenance
+
+function toggleMaintenance(state) {
+    const settingsRef = db.collection("settings").doc("server");
+
+    settingsRef.set({ maintenance: state }, { merge: true })
+    .then(() => {
+        console.log("Maintenance mode updated:", state);
+        alert(state ? "Server is now under maintenance!" : "Server is now active!");
+    })
+    .catch((error) => {
+        console.error("Error updating maintenance status:", error);
+    });
+}
+
 
     
     
