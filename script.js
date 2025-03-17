@@ -425,18 +425,6 @@ function loadEmails() {
 // Load emails on page load
 document.addEventListener("DOMContentLoaded", loadEmails);
 
-firebase.auth().onAuthStateChanged((user) => {
-    if (user) {
-        checkMaintenance(); // Check if maintenance is active
-
-        // Show admin panel only for developer
-        if (user.email === "fazrelmsyamil@gmail.com") {
-            document.getElementById("admin-panel").style.display = "block";
-        }
-    }
-});
-
-
 const maintenanceRef = firebase.firestore().collection("serverStatus").doc("status");
 
 // Function to check maintenance status
@@ -466,7 +454,7 @@ function startMaintenance() {
     document.body.innerHTML = `
         <div style="text-align:center; font-size:15px; margin-top:50px;">
             <h2>🚧 Server Under Maintenance 🚧</h2>
-            <p>The game is currently undergoing maintenance. Please check back later.</p>
+            <p>The game is currently undergoing maintenance. Please refresh the website again later.</p>
             <p>~ BitDTycoon Team.<i class="ri-verified-badge-fill"></i></p>
         </div>
     `;
@@ -506,10 +494,11 @@ firebase.auth().onAuthStateChanged((user) => {
     }
 });
 
+
 function toggleMaintenance(state) {
     const settingsRef = db.collection("settings").doc("server");
 
-    settingsRef.set({ maintenance: state }, { merge: true }) // ✅ Only updates maintenance field
+    settingsRef.set({ maintenance: state }, { merge: true })
     .then(() => {
         console.log("Maintenance mode updated:", state);
         alert(state ? "Server is now under maintenance!" : "Server is now active!");
@@ -519,8 +508,81 @@ function toggleMaintenance(state) {
     });
 }
 
-db.collection("users").doc(user.uid).update({ lastLogin: firebase.firestore.FieldValue.serverTimestamp() }); // ✅ Only updates timestamp
 
+// Load messages in real-time
+function loadMessages() {
+    db.collection("messages").orderBy("timestamp").onSnapshot(snapshot => {
+        const chatBox = document.getElementById("chat-box");
+        chatBox.innerHTML = ""; // Clear previous messages
 
+        snapshot.forEach(doc => {
+            const data = doc.data();
+            const messageElement = document.createElement("div");
+            messageElement.classList.add("chat-message");
 
-    
+            // Display username, message, and delete button if it's the user's message
+            messageElement.innerHTML = `
+                <img src="${data.photoURL}" class="chat-avatar">
+                <strong>${data.username}:</strong> ${data.message}
+                ${firebase.auth().currentUser && firebase.auth().currentUser.uid === data.uid ? 
+                    `<button onclick="deleteMessage('${doc.id}')">❌</button>` : ""}
+            `;
+
+            chatBox.appendChild(messageElement);
+        });
+
+        // Auto-scroll to latest message
+        chatBox.scrollTop = chatBox.scrollHeight;
+    });
+}
+
+// Send message to Firestore
+function sendMessage() {
+    const user = firebase.auth().currentUser;
+    if (!user) {
+        alert("You need to log in to chat!");
+        return;
+    }
+
+    const messageText = document.getElementById("message-input").value;
+    if (!messageText.trim()) return;
+
+    db.collection("messages").add({
+        uid: user.uid,
+        username: user.displayName,
+        photoURL: user.photoURL,
+        message: messageText,
+        timestamp: firebase.firestore.FieldValue.serverTimestamp()
+    }).then(() => {
+        document.getElementById("message-input").value = ""; // Clear input
+    }).catch(error => console.error("Error sending message:", error));
+}
+
+// Delete own message
+function deleteMessage(messageId) {
+    const user = firebase.auth().currentUser;
+    if (!user) return;
+
+    const messageRef = db.collection("messages").doc(messageId);
+
+    messageRef.get().then(doc => {
+        if (doc.exists && doc.data().uid === user.uid) {
+            messageRef.delete().catch(error => console.error("Error deleting message:", error));
+        }
+    });
+}
+
+// Enable chat when user logs in
+firebase.auth().onAuthStateChanged(user => {
+    const inputField = document.getElementById("message-input");
+    const sendButton = document.querySelector("#chat-container button");
+
+    if (user) {
+        inputField.disabled = false;
+        sendButton.disabled = false;
+        loadMessages(); // Start loading chat messages
+    } else {
+        inputField.disabled = true;
+        sendButton.disabled = true;
+    }
+});
