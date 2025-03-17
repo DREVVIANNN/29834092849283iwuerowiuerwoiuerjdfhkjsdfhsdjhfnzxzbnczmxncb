@@ -427,29 +427,58 @@ document.addEventListener("DOMContentLoaded", loadEmails);
 
 
 
-function checkIfBanned(user) {
-    const userId = user.uid;
-    const bannedRef = firebase.firestore().collection("bannedUsers").doc(userId);
+const maintenanceRef = firebase.firestore().collection("serverStatus").doc("status");
 
-    bannedRef.get().then((doc) => {
-        if (doc.exists) {
-            alert("You are banned from this game!");
-            firebase.auth().signOut();
-        } else {
-            loadUserData(user);
+// Function to check maintenance status
+function checkMaintenance() {
+    maintenanceRef.get().then((doc) => {
+        if (doc.exists && doc.data().maintenance === true) {
+            startMaintenance();
         }
     }).catch((error) => {
-        console.error("Error checking ban status:", error);
+        console.error("Error checking maintenance status:", error);
     });
 }
 
-// Call this function after Google Login
+// Function to start maintenance
+function startMaintenance() {
+    // Play maintenance song
+    let audio = new Audio("Growtopia Update Song.mp3");
+    audio.play();
+
+    // Show maintenance message after song finishes
+    audio.onended = () => {
+        document.body.innerHTML = `
+            <div style="text-align:center; font-size:24px; margin-top:50px;">
+                <h2>🚧 Server Under Maintenance 🚧</h2>
+                <p>The game is currently undergoing maintenance. Please check back later.</p>
+            </div>
+        `;
+
+        // Stop all game interactions
+        clearInterval(miningInterval);
+        firebase.auth().signOut(); // Log out users
+    };
+}
+
+// Function to toggle maintenance mode (Only for Developer)
+function toggleMaintenance(status) {
+    maintenanceRef.set({ maintenance: status }).then(() => {
+        alert(`Server maintenance ${status ? "started" : "ended"}`);
+    }).catch((error) => {
+        console.error("Error updating maintenance status:", error);
+    });
+}
+
+// Check maintenance status when page loads
 firebase.auth().onAuthStateChanged((user) => {
     if (user) {
-        checkIfBanned(user);
+        checkMaintenance();
     }
 });
 
- 
+toggleMaintenance(true); // Start maintenance
+toggleMaintenance(false); // End maintenance
+
     
     
