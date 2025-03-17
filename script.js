@@ -520,11 +520,14 @@ function loadMessages() {
             const messageElement = document.createElement("div");
             messageElement.classList.add("chat-message");
         
+            // Check if the user is verified
+            const verifiedBadge = data.verified ? '<span id="verified-badge"><i class="ri-verified-badge-fill"></i></span>' : '';
+        
             // Display user profile at the top and message below
             messageElement.innerHTML = `
                 <div class="user-info">
                     <img src="${data.photoURL}" class="chat-avatar">
-                    <strong>${data.username}</strong>
+                    <strong>${data.username}${verifiedBadge}</strong>
                     ${firebase.auth().currentUser && firebase.auth().currentUser.uid === data.uid ? 
                         `<a onclick="deleteMessage('${doc.id}')" class="delete-btn"><i class="ri-delete-bin-line"></i></a>` : ""}
                 </div>
@@ -535,6 +538,7 @@ function loadMessages() {
         
             chatBox.appendChild(messageElement);
         });
+        
         
 
         // Auto-scroll to latest message
