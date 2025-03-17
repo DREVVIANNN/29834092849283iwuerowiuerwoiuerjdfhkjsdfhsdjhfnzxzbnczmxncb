@@ -118,7 +118,7 @@ h2{
     padding: 10px;
     margin: 10px 0;
     border-radius: 8px;
-    width: 100%;
+    width: 50%;
 }
 
 .delete-btn {
@@ -134,7 +134,7 @@ h2{
     background: #333;
     padding: 8px;
     border-radius: 6px;
-    width: 60%;
+    width: 90%;
     color: white;
 }
 
