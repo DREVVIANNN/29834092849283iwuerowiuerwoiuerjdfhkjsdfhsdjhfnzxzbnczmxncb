@@ -117,8 +117,8 @@ h2{
     padding: 12px;
     margin: 5px 0;
     border-radius: 15px;
-    width: auto;
-    max-width: 80%;
+    width: auto; /* Adjust width dynamically */
+    max-width: 80%; /* Prevent it from stretching too wide */
     word-wrap: break-word; /* Force long words to break */
     overflow-wrap: break-word; /* Ensure words don't overflow */
     white-space: pre-wrap; /* Preserve line breaks and wrap text */
@@ -133,9 +133,11 @@ h2{
 }
 
 .message-content {
+    margin-top: 5px;
     background: #333;
-    padding: 10px;
-    border-radius: 10px;
+    padding: 8px;
+    border-radius: 6px;
+    width: 100%;
     color: white;
     word-wrap: break-word; /* Ensure text breaks inside the container */
     overflow-wrap: break-word; 
