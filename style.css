@@ -203,7 +203,6 @@ h2{
     word-wrap: break-word;
     overflow-wrap: break-word;
     white-space: pre-wrap;
-    margin-left: 2.5rem;
     text-align: center; /* Center the text */
     display: flex;
     justify-content: center; /* Center text inside */
