@@ -427,6 +427,28 @@ document.addEventListener("DOMContentLoaded", loadEmails);
 
 
 
+function checkIfBanned(user) {
+    const userId = user.uid;
+    const bannedRef = firebase.firestore().collection("bannedUsers").doc(userId);
+
+    bannedRef.get().then((doc) => {
+        if (doc.exists) {
+            alert("You are banned from this game!");
+            firebase.auth().signOut();
+        } else {
+            loadUserData(user);
+        }
+    }).catch((error) => {
+        console.error("Error checking ban status:", error);
+    });
+}
+
+// Call this function after Google Login
+firebase.auth().onAuthStateChanged((user) => {
+    if (user) {
+        checkIfBanned(user);
+    }
+});
 
  
     
