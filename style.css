@@ -105,23 +105,32 @@ h2{
     display: flex;
     flex-direction: column;
     align-items: center; /* Center messages */
-    gap: 10px;
-    padding: 10px;
+    gap: 12px;
+    padding: 15px;
     max-width: 100%;
     overflow-y: auto;
 }
 .chat-message {
     display: flex;
     flex-direction: column;
-    background: #222;
-    padding: 12px;
-    margin: 5px 0;
-    border-radius: 15px;
-    width: auto; /* Adjust width dynamically */
-    max-width: 80%; /* Prevent it from stretching too wide */
-    word-wrap: break-word; /* Force long words to break */
-    overflow-wrap: break-word; /* Ensure words don't overflow */
-    white-space: pre-wrap; /* Preserve line breaks and wrap text */
+    background: linear-gradient(135deg, #252A34, #1B1F28); /* Gradient for depth */
+    padding: 14px;
+    margin: 8px 0;
+    border-radius: 16px;
+    width: auto;
+    max-width: 75%;
+    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.15); /* Soft shadow */
+    transition: 0.2s ease-in-out;
+}
+.chat-message:hover {
+    transform: translateY(-2px); /* Subtle hover effect */
+}
+
+.user-info {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 6px;
 }
 
 .delete-btn {
@@ -132,23 +141,40 @@ h2{
     margin-left: auto;
 }
 
+/* Modern animation when message appears */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(5px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.chat-message {
+    animation: fadeIn 0.3s ease-in-out;
+}
+
 .message-content {
-    margin-top: 5px;
-    background: #333;
-    padding: 8px;
-    border-radius: 6px;
-    width: 100%;
-    color: white;
-    word-wrap: break-word; /* Ensure text breaks inside the container */
-    overflow-wrap: break-word; 
-    white-space: pre-wrap; /* Preserve spaces and wrap text */
+    background: rgba(255, 255, 255, 0.1);
+    padding: 12px;
+    border-radius: 12px;
+    color: #EAEAEA;
+    font-size: 15px;
+    line-height: 1.5;
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+    white-space: pre-wrap;
     text-align: left;
 }
 
 .chat-avatar {
-    width: 30px;
-    height: 30px;
+    width: 45px;
+    height: 45px;
     border-radius: 50%;
+    border: 2px solid #4A90E2;
 }
 .message {
     display: flex;
@@ -374,11 +400,11 @@ textarea {
         width: 325px;
     }
     .chat-message {
-        max-width: 90%; /* Make it wider on small screens */
+        max-width: 90%;
         font-size: 14px;
     }
     .chat-avatar {
-        width: 35px;
-        height: 35px;
+        width: 38px;
+        height: 38px;
     }
 }
