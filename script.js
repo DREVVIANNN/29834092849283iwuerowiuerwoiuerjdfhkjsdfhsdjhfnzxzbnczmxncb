@@ -519,17 +519,23 @@ function loadMessages() {
             const data = doc.data();
             const messageElement = document.createElement("div");
             messageElement.classList.add("chat-message");
-
-            // Display username, message, and delete button if it's the user's message
+        
+            // Display user profile at the top and message below
             messageElement.innerHTML = `
-                <img src="${data.photoURL}" class="chat-avatar">
-                <strong>${data.username}:</strong> ${data.message}
-                ${firebase.auth().currentUser && firebase.auth().currentUser.uid === data.uid ? 
-                    `<button onclick="deleteMessage('${doc.id}')">❌</button>` : ""}
+                <div class="user-info">
+                    <img src="${data.photoURL}" class="chat-avatar">
+                    <strong>${data.username}</strong>
+                    ${firebase.auth().currentUser && firebase.auth().currentUser.uid === data.uid ? 
+                        `<a onclick="deleteMessage('${doc.id}')" class="delete-btn"><i class="ri-delete-bin-line"></i></a>` : ""}
+                </div>
+                <div class="message-content">
+                    <p>${data.message}</p>
+                </div>
             `;
-
+        
             chatBox.appendChild(messageElement);
         });
+        
 
         // Auto-scroll to latest message
         chatBox.scrollTop = chatBox.scrollHeight;
