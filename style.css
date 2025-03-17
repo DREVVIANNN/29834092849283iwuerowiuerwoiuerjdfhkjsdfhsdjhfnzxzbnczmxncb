@@ -96,31 +96,56 @@ h2{
     padding: 10px;
     border-radius: 5px;
 }
+.request-login{
+    color: gray;
+    user-select: none;
+}
 #message-input{
-    width: 200px;
+    width: 240px;
     height: 30px;
     border-radius: 5px;
 }
 #chat-box {
+    width: 320px;
+    height: 300px;
     display: flex;
+    justify-self: center;
     flex-direction: column;
-    align-items: center; /* Center messages */
-    gap: 12px;
-    padding: 15px;
-    max-width: 100%;
-    overflow-y: auto;
+    background: #181A1E;
+    border-radius: 12px;
+    padding: 10px;
+    overflow-y: auto; /* Enable scrolling */
+    scrollbar-width: thin; /* Firefox */
+    scrollbar-color: #888 #222;
+    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.15);
+}
+/* Custom scrollbar for WebKit browsers */
+#chat-box::-webkit-scrollbar {
+    width: 6px;
+}
+
+#chat-box::-webkit-scrollbar-track {
+    background: #222;
+}
+
+#chat-box::-webkit-scrollbar-thumb {
+    background: #666;
+    border-radius: 6px;
 }
 .chat-message {
-    display: flex;
-    flex-direction: column;
-    background: linear-gradient(135deg, #252A34, #1B1F28); /* Gradient for depth */
-    padding: 14px;
-    margin: 8px 0;
-    border-radius: 16px;
-    width: auto;
-    max-width: 75%;
-    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.15); /* Soft shadow */
-    transition: 0.2s ease-in-out;
+    max-width: 90%;
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+    white-space: pre-wrap;
+    font-size: 12px; /* Smaller font */
+    line-height: 1.4;
+    padding: 6px;
+    border-radius: 8px;
+    background: #252A34;
+    color: #EAEAEA;
+    margin: 3px auto;
+    text-align: left;
+    display: block;
 }
 .chat-message:hover {
     transform: translateY(-2px); /* Subtle hover effect */
@@ -158,23 +183,21 @@ h2{
 }
 
 .message-content {
-    background: rgba(255, 255, 255, 0.1);
-    padding: 12px;
-    border-radius: 12px;
-    color: #EAEAEA;
-    font-size: 15px;
-    line-height: 1.5;
-    word-wrap: break-word;
-    overflow-wrap: break-word;
-    white-space: pre-wrap;
-    text-align: left;
+    width: 85%;
+    padding: 8px;
+    font-size: 14px;
+    border-radius: 8px;
+    border: none;
+    outline: none;
+    background: #222;
+    color: white;
+
 }
 
 .chat-avatar {
-    width: 45px;
-    height: 45px;
+    width: 32px; /* Smaller avatar */
+    height: 32px;
     border-radius: 50%;
-    border: 2px solid #4A90E2;
 }
 .message {
     display: flex;
@@ -182,8 +205,16 @@ h2{
     margin: 5px 0;
 }
 .send-btn{
-    width: 65px;
-    text-align: center;
+    width: 55px;
+    height: 40px;
+    background: #4A90E2;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    transition: 0.2s;
 }
 .avatar {
     width: 30px;
