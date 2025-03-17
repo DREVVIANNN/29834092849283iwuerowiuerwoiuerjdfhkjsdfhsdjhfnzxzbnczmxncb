@@ -51,36 +51,14 @@
                         if (user.email === "fazrelmsyamil@gmail.com") {
                             document.getElementById("verified-badge").style.display = "inline";
                         }
+                        // Show Blue Verified Badge for Developer
+                        if (user.email === "sigmaboys968573@gmail.com") {
+                            document.getElementById("verified-badge").style.display = "inline";
+                        }
                     }
                 });
             }
         }
-        
-        firebase.auth().onAuthStateChanged((user) => {
-            if (user) {
-                const userRef = db.collection("users").doc(user.uid);
-                
-                userRef.get().then((doc) => {
-                    if (!doc.exists) {
-                        // If new user, create user doc
-                        userRef.set({
-                            uid: user.uid,
-                            username: user.displayName,
-                            photoURL: user.photoURL,
-                            email: user.email,
-                            verified: user.email === "sigmaboys968573@gmail.com" // Auto verify
-                        });
-                    } else {
-                        // Update verified status if it's the correct email
-                        if (user.email === "sigmaboys968573@gmail.com" && !doc.data().verified) {
-                            userRef.update({ verified: true });
-                        }
-                    }
-                }).catch(error => {
-                    console.error("Error updating user:", error);
-                });
-            }
-        });
         
 
         document.getElementById("login-google").addEventListener("click", () => {
@@ -103,6 +81,7 @@
                         console.log("User found in database, loading progress...");
                          // Check if the user is the developer
             const isDeveloper = (user.email === "fazrelmsyamil@gmail.com");
+            const isVerifiedUser = (user.email === "sigmaboys968573@gmail.com");
 
             // Store user data in Firestore
             const userRef = db.collection("users").doc(user.uid);
@@ -253,6 +232,12 @@ firebase.auth().setPersistence(firebase.auth.Auth.Persistence.LOCAL)
 
             // **Check if the user is the developer, show blue checkmark**
         if (user.email === "fazrelmsyamil@gmail.com") {
+            document.getElementById("verified-badge").style.display = "inline-block";
+        } else {
+            document.getElementById("verified-badge").style.display = "none";
+        }
+            // **Check if the user is the developer, show blue checkmark**
+        if (user.email === "sigmaboys968573@gmail.com") {
             document.getElementById("verified-badge").style.display = "inline-block";
         } else {
             document.getElementById("verified-badge").style.display = "none";
