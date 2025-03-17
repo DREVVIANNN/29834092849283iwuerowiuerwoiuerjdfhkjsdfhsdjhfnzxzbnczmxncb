@@ -112,7 +112,7 @@ h2{
     background: #333;
 }
 .chat-message {
-    display: flex;
+    display: grid;
     flex-direction: column;
     background: #222;
     padding: 10px;
@@ -121,6 +121,7 @@ h2{
     width: 300px;
     position: relative;
     justify-self: center;
+    justify-content: center;
 }
 
 .delete-btn {
