@@ -506,11 +506,10 @@ firebase.auth().onAuthStateChanged((user) => {
     }
 });
 
-
 function toggleMaintenance(state) {
     const settingsRef = db.collection("settings").doc("server");
 
-    settingsRef.set({ maintenance: state }, { merge: true })
+    settingsRef.set({ maintenance: state }, { merge: true }) // ✅ Only updates maintenance field
     .then(() => {
         console.log("Maintenance mode updated:", state);
         alert(state ? "Server is now under maintenance!" : "Server is now active!");
@@ -520,6 +519,8 @@ function toggleMaintenance(state) {
     });
 }
 
+db.collection("users").doc(user.uid).update({ lastLogin: firebase.firestore.FieldValue.serverTimestamp() }); // ✅ Only updates timestamp
 
-    
+
+
     
