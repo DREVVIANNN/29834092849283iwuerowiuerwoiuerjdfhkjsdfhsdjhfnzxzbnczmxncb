@@ -102,23 +102,23 @@ h2{
     border-radius: 5px;
 }
 #chat-box {
-    max-width: 350px;
-    max-height: 200px;
-    margin-left: 1.5rem;
+    display: flex;
+    flex-direction: column;
+    align-items: center; /* Center messages */
+    gap: 10px;
+    padding: 10px;
+    max-width: 100%;
     overflow-y: auto;
-    margin-bottom: 10px;
-    padding: 5px;
-    border: 1px solid #555;
-    background: #333;
 }
 .chat-message {
     display: flex;
     flex-direction: column;
     background: #222;
-    padding: 10px;
-    margin: 10px 0;
-    border-radius: 8px;
-    width: 100%;
+    padding: 12px;
+    margin: 5px 0;
+    border-radius: 15px;
+    width: auto; /* Adjust width dynamically */
+    max-width: 80%; /* Prevent it from stretching too wide */
 }
 
 .delete-btn {
@@ -340,7 +340,7 @@ textarea {
     border-bottom: 1px solid #444;
 }
 
-@media (max-width: 765px) {
+@media (max-width: 768px) {
     .container{
         width: 400px;
     }
@@ -365,5 +365,13 @@ textarea {
 
     .send-button{
         width: 325px;
+    }
+    .chat-message {
+        max-width: 90%; /* Make it wider on small screens */
+        font-size: 14px;
+    }
+    .chat-avatar {
+        width: 35px;
+        height: 35px;
     }
 }
