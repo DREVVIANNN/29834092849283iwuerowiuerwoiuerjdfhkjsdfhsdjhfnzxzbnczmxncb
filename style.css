@@ -105,19 +105,12 @@ h2{
     height: 30px;
     border-radius: 5px;
 }
+/* Chat Box Scroll */
 #chat-box {
-    width: 320px;
-    height: 300px;
-    display: flex;
-    justify-self: center;
-    flex-direction: column;
-    background: #181A1E;
-    border-radius: 12px;
-    padding: 10px;
-    overflow-y: auto; /* Enable scrolling */
-    scrollbar-width: thin; /* Firefox */
-    scrollbar-color: #888 #222;
-    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.15);
+    max-height: 300px;
+    overflow-y: auto;
+    scrollbar-width: thin;
+    scrollbar-color: #444 #1e1e1e;
 }
 /* Custom scrollbar for WebKit browsers */
 #chat-box::-webkit-scrollbar {
@@ -132,23 +125,47 @@ h2{
     background: #666;
     border-radius: 6px;
 }
+/* Chat Message Container */
 .chat-message {
-    max-width: 90%;
-    word-wrap: break-word;
-    overflow-wrap: break-word;
-    white-space: pre-wrap;
-    font-size: 12px; /* Smaller font */
-    line-height: 1.4;
-    padding: 6px;
-    border-radius: 8px;
-    background: #252A34;
-    color: #EAEAEA;
-    margin: 3px auto;
-    text-align: left;
-    display: block;
+    max-width: 75%;
+    padding: 8px 12px;
+    font-size: 13px;
+    border-radius: 12px;
+    margin: 6px 0;
+    display: flex;
+    align-items: center;
+    position: relative;
+    background: #1e1e1e; /* Dark sleek background */
+    color: white;
+    box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.2);
+    transition: 0.2s ease-in-out;
 }
-.chat-message:hover {
-    transform: translateY(-2px); /* Subtle hover effect */
+
+/* Chat Bubble Tail (Left Side for Sent Messages) */
+.chat-message::before {
+    content: "";
+    position: absolute;
+    bottom: 0;
+    left: -8px;
+    width: 12px;
+    height: 12px;
+    background: inherit;
+    clip-path: polygon(100% 0, 0 0, 100% 100%);
+}
+
+/* Different Style for the Sender */
+.chat-message.sender {
+    background: #007aff; /* Blue bubble */
+    color: white;
+    align-self: flex-end;
+}
+
+/* Tail for Sender Messages */
+.chat-message.sender::before {
+    left: auto;
+    right: -8px;
+    clip-path: polygon(0 0, 100% 0, 0 100%);
+    background: #007aff;
 }
 
 .user-info {
@@ -194,10 +211,12 @@ h2{
 
 }
 
+/* Avatar Size */
 .chat-avatar {
-    width: 32px; /* Smaller avatar */
+    width: 32px;
     height: 32px;
     border-radius: 50%;
+    margin-right: 8px;
 }
 .message {
     display: flex;
