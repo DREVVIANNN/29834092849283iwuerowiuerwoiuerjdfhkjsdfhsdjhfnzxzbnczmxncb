@@ -13,7 +13,7 @@
             if (bitdrevv >= upgradeCost) {
                 bitdrevv -= upgradeCost;
                 miningPower++;
-                upgradeCost = Math.ceil(upgradeCost * 1.5);
+                upgradeCost = Math.ceil(upgradeCost * 5);
                 updateUI();
                 saveUserData();
             }
@@ -51,6 +51,11 @@
                         if (user.email === "fazrelmsyamil@gmail.com") {
                             document.getElementById("verified-badge").style.display = "inline";
                         }
+
+                        // Show Blue Verified Badge for Developer
+                        if (user.email === "sigmaboys968573@gmail.com") {
+                            document.getElementById("verified-badge").style.display = "inline";
+                        }
                     }
                 });
             }
@@ -76,7 +81,7 @@
                         // Load existing Firebase data
                         console.log("User found in database, loading progress...");
                          // Check if the user is the developer
-            const isDeveloper = (user.email === "fazrelmsyamil@gmail.com");
+            const isDeveloper = (user.email === "fazrelmsyamil@gmail.com", "sigmaboys968573@gmail.com");
 
             // Store user data in Firestore
             const userRef = db.collection("users").doc(user.uid);
@@ -89,7 +94,7 @@
                         loadUserData();
                     } else {
                         // 🚀 Transfer guest progress to Firestore if available
-                        bitdrevv = parseInt(localStorage.getItem("bitdrevv")) || 50; // New users get 50 BTD
+                        bitdrevv = parseInt(localStorage.getItem("bitdrevv")) || 10; // New users get 10 BTD
                         upgradeCost = parseInt(localStorage.getItem("upgradeCost")) || 10;
                         miningPower = parseInt(localStorage.getItem("miningPower")) || 1;
         
@@ -227,6 +232,11 @@ firebase.auth().setPersistence(firebase.auth.Auth.Persistence.LOCAL)
 
             // **Check if the user is the developer, show blue checkmark**
         if (user.email === "fazrelmsyamil@gmail.com") {
+            document.getElementById("verified-badge").style.display = "inline-block";
+        } else {
+            document.getElementById("verified-badge").style.display = "none";
+        }
+        if (user.email === "sigmaboys968573@gmail.com") {
             document.getElementById("verified-badge").style.display = "inline-block";
         } else {
             document.getElementById("verified-badge").style.display = "none";
@@ -415,119 +425,6 @@ function loadEmails() {
 document.addEventListener("DOMContentLoaded", loadEmails);
 
 
-
-let selectedUserId = null; // Store selected user ID
-
-function searchUsers() {
-    let query = document.getElementById("searchUser").value.toLowerCase();
-    let userList = document.getElementById("userList");
-    userList.innerHTML = ""; // Clear previous results
-
-    db.collection("users").get()
-        .then(snapshot => {
-            snapshot.forEach(doc => {
-                let user = doc.data();
-                if (user.username.toLowerCase().includes(query)) {
-                    let userElement = document.createElement("div");
-                    userElement.innerHTML = `
-                        <img src="${user.photoURL}" width="30" height="30"> 
-                        <span>${user.username}</span>
-                    `;
-                    userElement.onclick = () => openChat(user.uid, user.username);
-                    userList.appendChild(userElement);
-                }
-            });
-        })
-        .catch(error => {
-            console.error("Error fetching users:", error);
-        });
-}
-
-function getUserData(userId) {
-    db.collection("users").doc(userId).get()
-        .then(doc => {
-            if (doc.exists) {
-                let data = doc.data();
-                console.log("Username:", data.username);
-                console.log("Photo:", data.photoURL);
-            } else {
-                console.log("No user found!");
-            }
-        })
-        .catch(error => {
-            console.error("Error fetching user:", error);
-        });
-}
-
-
-// Function to open chat with user
-function openChat(userId, username) {
-    selectedUserId = userId;
-    document.getElementById("chatUser").textContent = username;
-    document.getElementById("chatWindow").classList.remove("hidden");
-    loadMessages();
-}
-
-// Function to send message
-function sendMessage() {
-    let message = document.getElementById("messageInput").value;
-    if (!message || !selectedUserId) return;
-
-    let user = auth.currentUser;
-
-    db.collection("messages").add({
-        senderId: user.uid,
-        receiverId: selectedUserId,
-        message: message,
-        timestamp: firebase.firestore.FieldValue.serverTimestamp()
-    });
-
-    document.getElementById("messageInput").value = ""; // Clear input
-}
-
-// Function to load messages in real-time
-function loadMessages() {
-    let user = auth.currentUser;
-
-    db.collection("messages")
-      .where("senderId", "in", [user.uid, selectedUserId])
-      .where("receiverId", "in", [user.uid, selectedUserId])
-      .orderBy("timestamp")
-      .onSnapshot(snapshot => {
-        let messagesContainer = document.getElementById("messagesContainer");
-        messagesContainer.innerHTML = "";
-
-        snapshot.forEach(doc => {
-            let data = doc.data();
-            let msgDiv = document.createElement("div");
-            msgDiv.textContent = data.message;
-            msgDiv.style.color = data.senderId === user.uid ? "cyan" : "white";
-            messagesContainer.appendChild(msgDiv);
-        });
-    });
-}
-  
-firebase.auth().onAuthStateChanged((user) => {
-    if (user) {
-        const userRef = db.collection("users").doc(user.uid);
-
-        userRef.get().then((doc) => {
-            if (!doc.exists) {
-                userRef.set({
-                    uid: user.uid,
-                    username: user.displayName,
-                    photoURL: user.photoURL
-                }).then(() => {
-                    console.log("User data saved to Firestore");
-                }).catch(error => {
-                    console.error("Error saving user:", error);
-                });
-            }
-        }).catch(error => {
-            console.error("Error checking user:", error);
-        });
-    }
-});
 
 
  

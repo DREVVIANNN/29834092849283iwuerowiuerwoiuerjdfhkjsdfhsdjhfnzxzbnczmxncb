@@ -1,5 +1,5 @@
 body {
-    font-family: Arial, sans-serif;
+    font-family: monospace;
     text-align: center;
     background-color: #121212;
     color: #fff;
@@ -74,48 +74,55 @@ h2{
     margin-right: 5px;
 }
 
-.chat-container {
-    max-width: 450px;
-    margin: auto;
-    padding: 10px;
-    background: #222;
-    color: white;
-    border-radius: 10px;
-}
-#userList div {
-    padding: 5px;
-    cursor: pointer;
-}
-.hidden {
-    display: none;
-}
-
 
 #verified-badge {
     color: goldenrod;
     font-weight: bold;
 }
 
+.icon{
+    width: 2rem;
+    user-select: none;
+}
 
+.copy{
+    color: gray;
+    margin-top: 1rem;
+    user-select: none;
+}
 
+.ri-btc-fill{
+    color: gold;
+    margin-left: 3px;
+    font-size: 11px;
+}
 
 .ri-vip-crown-fill{
     color: gold;
 }
 
+::-webkit-scrollbar{
+    width: 5px;
+    background-color: #222;
+}
+::-webkit-scrollbar-thumb{
+    background-color: #1e1e1e;
+}
+
 button {
-    background: #f7931a;
-    color: white;
+    background: white;
+    color: black;
     border: none;
     padding: 10px 20px;
     font-size: 16px;
+    font-family: monospace;
     cursor: pointer;
     border-radius: 5px;
     margin: 10px;
-    transition: background 0.3s;
+    transition: 0.3s;
 }
-button:hover {
-    background: #ff9900;
+button:hover{
+    box-shadow: 0px 0px 10px white;
 }
 h1{
     font-size: 20px;
@@ -200,7 +207,7 @@ textarea {
     height: 20px;
     padding: 10px 10px 5px;
     resize: none;
-    font-family: sans-serif;
+    font-family: monospace;
     border-radius: 5px;
     overflow: hidden;
 }
@@ -218,9 +225,18 @@ textarea {
 .send-button{
     justify-self: center;
     display: grid;
+    background-color: white;
     justify-content: center;
+    color: black;
     position: relative;
+    box-shadow: 0 0 20px #777;
     width: 225px;
+    transition: all .4s;
+}
+.send-button:hover{
+    background-color: #1e1e1e;
+    color: white;
+    box-shadow: 0px 0px 20px #333;
 }
 #leaderboard h2 {
     text-align: center;
@@ -255,6 +271,6 @@ textarea {
     }
 
     .send-button{
-        width: 350px;
+        width: 325px;
     }
 }

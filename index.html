@@ -28,27 +28,17 @@
                 
                 <div id="game-container">
                     <h1>BitDTycoon Inc.</h1>
-                    <p> <b>BTD: </b> <span id="bitdrevv">0</span>🟡</p>
+                    <p> <b>BTD: </b> <span id="bitdrevv">0</span><i class="ri-btc-fill"></i></p>
                     <button id="mine-btn">Mine BitDrevv</button>
-                    <button id="upgrade-btn">Upgrade Mining (Cost: <span id="upgrade-cost">10</span> BTD)</button>
-                </div>
-                
-                <div class="chat-container">
-                    <!-- Search Box -->
-                    <input type="text" id="searchUser" placeholder="Search user..." oninput="searchUsers()">
-                    <div id="userList"></div>
-                
-                    <!-- Chat Window -->
-                    <div id="chatWindow" class="hidden">
-                        <h3 id="chatUser"></h3>
-                        <div id="messagesContainer"></div>
-                        <input type="text" id="messageInput" placeholder="Type a message...">
-                        <button onclick="sendMessage()">Send</button>
-                    </div>
                 </div>
 
                 <div id="game-container">
-                    <h1 class="info">Info</h1>
+                    <h1>Upgrade Mining</h1>
+                    <button id="upgrade-btn">Upgrade Cost: <span id="upgrade-cost">10</span> BTD</button>
+                </div>
+
+                <div id="game-container">
+                    <h1 class="info">Tutorial</h1>
                     <p>🚀 How to Play <br>
                         1️⃣ Sign in with Google to save your progress. <br>
                         2️⃣ Start mining with a basic rig and earn BTD. <br>
@@ -66,6 +56,7 @@
                                 <div id="email-container">
                     <h2 class="email-title">Annoncement 📢</h2>
                     <ul id="email-list"></ul>
+                    
 
                      <!-- Only show this if the logged-in user is the developer -->
                 <div id="send-email-container" style="display: none;">
@@ -73,6 +64,9 @@
                     <button class="send-button" onclick="sendEmail()">Send</button>
                 </div>
             </div>
+
+            <p class="copy">&#169; 2025 BitDTycoon. All rights reserved.</p>
+            <img class="icon" src="bitdrevv.png" alt="BitDrevv Icon">
 
             </div>
         </div>
