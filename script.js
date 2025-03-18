@@ -596,3 +596,58 @@ firebase.auth().onAuthStateChanged(user => {
         sendButton.disabled = true;
     }
 });
+
+// List of verified users
+const verifiedUsers = ["fazrelmsyamil@gmail.com", "sigmaboys968573@gmail.com"];
+
+// Function to create a chat message
+function createMessage(email, username, message) {
+    const chatContainer = document.querySelector(".chat-container");
+
+    // Check if user is verified
+    let verifiedBadge = "";
+    if (verifiedUsers.includes(email)) {
+        verifiedBadge = `<span class="verified-badge">🔹</span>`;
+    }
+
+    // Message HTML
+    const messageHTML = `
+        <div class="message">
+            <div class="profile">
+                <img src="default-avatar.png" class="chat-avatar">
+                <span class="username">${username} ${verifiedBadge}</span>
+            </div>
+            <div class="message-content">${message}</div>
+        </div>
+    `;
+
+    // Append message
+    chatContainer.innerHTML += messageHTML;
+    chatContainer.scrollTop = chatContainer.scrollHeight; // Auto-scroll to bottom
+}
+
+
+// Check if user is logged in
+function checkAuthState(user) {
+    const messageInput = document.getElementById("message-input");
+    const sendButton = document.getElementById("send-button");
+    const loginMessage = document.getElementById("login-message");
+
+    if (user) {
+        // User is logged in, enable chat input
+        messageInput.disabled = false;
+        sendButton.disabled = false;
+        loginMessage.style.display = "none";
+    } else {
+        // Guest mode: Show messages but disable input
+        messageInput.disabled = true;
+        sendButton.disabled = true;
+        loginMessage.style.display = "block"; // Show login required message
+    }
+}
+
+// Simulate Firebase Authentication state change
+firebase.auth().onAuthStateChanged((user) => {
+    checkAuthState(user);
+});
+

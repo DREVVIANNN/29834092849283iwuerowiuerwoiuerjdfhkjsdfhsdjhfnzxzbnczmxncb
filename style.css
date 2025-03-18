@@ -188,7 +188,7 @@ h2{
     font-weight: bold;
     color: white;
     text-align: center;
-    margin-top: 5px;
+    margin-bottom: 5px;
 }
 .delete-btn {
     background: transparent;
@@ -208,6 +208,19 @@ h2{
     justify-content: center;
     color: white;
     transition: 0.2s;
+}
+
+#login-message {
+    color: gray;
+    font-size: 14px;
+    text-align: center;
+    margin-top: 5px;
+    display: none; /* Hidden by default */
+}
+
+#message-input:disabled, #send-button:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
 }
 .avatar {
     width: 30px;
